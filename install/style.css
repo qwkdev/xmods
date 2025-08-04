@@ -1,0 +1,235 @@
+*::selection {
+	background-color: #ffffff77;
+}
+body {
+	margin: 0;
+	background: #080810;
+	overflow: hidden;
+}
+img {
+	pointer-events: none;
+}
+p a {
+	position: relative;
+	transition: .2s;
+	z-index: 2;
+	text-decoration: none;
+	color: #ffffff;
+
+	/* -webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none; */
+
+	.underline {
+		width: 110%;
+		transform: translate(-4%, 0);
+		height: 1px;
+		background-color: #ffffff;
+		position: absolute;
+		bottom: 0;
+		transition: .2s;
+		z-index: -100;
+	}
+}
+p a:hover {
+	color: #000000 !important;
+
+	.underline {
+		height: 100%;
+	}
+}
+
+#logo {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: max-content;
+	height: max-content;
+	background: rgba(245, 245, 255, 0.075);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.164);
+	border-right: 1px solid rgba(255, 255, 255, 0.164);
+	backdrop-filter: blur(10px);
+	border-bottom-right-radius: 1vh;
+	z-index: 50;
+	text-decoration: none;
+
+	h1 {
+		width: max-content;
+		height: max-content;
+		margin: 1vh 2vh;
+		font-size: 4vh;
+		text-align: center;
+		color: #ffffff;
+		font-family: "Montserrat", arial;
+		text-decoration: none;
+	}
+}
+#notes, .step {
+	background: #080810;
+	width: 100vw;
+	height: 100vh;
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+#notes::-webkit-scrollbar, .step::-webkit-scrollbar {
+	display: none;
+}
+#grid {
+	display: grid;
+	grid-template-columns: repeat(3, 100vw);
+
+	transition: transform 1s;
+}
+
+.step {
+	display: grid;
+	grid-template-columns: 40vw 60vw;
+	position: relative;
+
+	h1, h2, p, a {
+		color: #ffffff;
+		font-family: "Montserrat", arial;
+	}
+	h1 {
+		font-size: 7vh;
+		margin: 12vh 0 0 12vw;
+	}
+	h2 {
+		font-size: 3.5vh;
+		margin: .5vh 0 0 12vw;
+		width: 27vw;
+	}
+	p {
+		font-size: 2.5vh;
+		margin: 4vh 0 0 12vw;
+		width: 27vw;
+	}
+	#link-1, #link-2, .prev, .next {
+		width: max-content;
+		height: max-content;
+		border-radius: 1vh;
+		color: #ffffff;
+		font-family: "Montserrat", arial;
+		font-weight: 700;
+		font-size: 5vh;
+		transition: .4s;
+		z-index: 100;
+		background: #078f0a;
+		border: .5vh solid #00ff00;
+		box-shadow: 0 0 4vh -1vh #00ff0077;
+		text-decoration: none;
+		text-align: center;
+	}
+	.prev:hover, .next:hover {
+		transform: scale(1.02);
+	}
+	#link-1:hover,
+	#link-2:hover {
+		transform: translateX(-50%) scale(1.02);
+	}
+	#link-1 {
+		position: absolute;
+		top: 4vh;
+		left: 50%;
+		transform: translateX(-50%);
+
+		padding: 2vh 2vw;
+		line-height: 5vh;
+	}
+	#link-2 {
+		position: absolute;
+		top: 4vh;
+		left: 50%;
+		transform: translateX(-50%);
+
+		padding: 2vh 2vw;
+		line-height: 5vh;
+	}
+	
+	.next, .prev {
+		position: absolute;
+		bottom: 10vh;
+		padding: 2vh 2vw;
+		line-height: 5vh;
+	}
+	.next { right: 12vw; }
+	.prev { left: 12vw; }
+
+	#step1-1 {
+		margin: 12vh 12vw 0 0;
+		width: 48vw;
+		height: auto;
+		border-radius: 2vh 2vh .5vh 2vh;
+	}
+	#step1-2 {
+		margin: 0 12vw 0 0;
+		float: right;
+		width: 28vw;
+		height: calc(28vw * (304/508));
+		border-radius: .5vh .5vh 2vh 2vh;
+	}
+	#step2 {
+		margin: 12vh 12vw 0 0;
+		width: 48vw;
+		height: auto;
+		border-radius: 2vh;
+	}
+}
+#notes {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	width: 100vw;
+
+	h1, h2, p, a, li {
+		color: #ffffff;
+		font-family: "Montserrat", arial;
+	}
+	h1 {
+		font-size: 7vh;
+		margin: 12vh 0 0 12vw;
+		width: 50vw;
+	}
+	h2 {
+		font-size: 3.5vh;
+		margin: 2vh 0 0 12vw;
+		width: 27vw;
+	}
+	p {
+		font-size: 2.5vh;
+		margin: 0 0 2vh 12vw;
+		width: 76vw;
+	}
+	ul {
+		margin: 0 0 0 12vw;
+	}
+	li {
+		font-size: 2.5vh;
+	}
+
+	.prev {
+		position: sticky;
+		margin: 0 12vw 0 auto;
+		bottom: 10vh;
+		padding: 2vh 2vw;
+		line-height: 5vh;
+		width: max-content;
+		height: max-content;
+		border-radius: 1vh;
+		font-weight: 700;
+		font-size: 5vh;
+		transition: .4s;
+		z-index: 100;
+		background: #078f0a;
+		border: .5vh solid #00ff00;
+		box-shadow: 0 0 4vh -1vh #00ff0077;
+		text-decoration: none;
+		text-align: center;
+		color: #ffffff;
+		font-family: "Montserrat", arial;
+	}
+	.prev:hover {
+		transform: scale(1.02);
+	}
+}

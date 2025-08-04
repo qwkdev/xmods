@@ -1,0 +1,55 @@
+<head>
+	<style>
+		body {
+			margin: 0;
+			overflow-x: hidden;
+		}
+
+		#grid {
+			display: grid;
+			grid-template-columns: repeat(3, 100vw);
+		}
+
+		.card {
+			width: 100vw;
+			height: 100vh;
+			position: relative;
+			scroll-behavior: smooth;
+
+			a {
+				font-size: 10vh;
+				color: white;
+				
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+		}
+	</style>
+</head>
+<body>
+	<div id="grid">
+		<div id="d1" class="card" style="background-color: red;">
+			<a href="#d2">next</a>
+		</div>
+		<div id="d2" class="card" style="background-color: green;">
+			<a href="#d3">next</a>
+		</div>
+		<div id="d3" class="card" style="background-color: blue;">
+			<a href="#d1">next</a>
+		</div>
+	</div>
+
+	<script>
+		document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+			anchor.addEventListener('click', function (e) {
+				e.preventDefault();
+
+				document.querySelector(this.getAttribute('href')).scrollIntoView({
+					behavior: 'smooth'
+				});
+			});
+		});
+	</script>
+</body>
