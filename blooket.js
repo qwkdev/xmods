@@ -125,6 +125,53 @@ css.textContent = `
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
 }
+
+#xmods-gui-main {
+	position: absolute;
+	width: 100%;
+	height: calc(100% - (var(--gui-width) * 0.19));
+	top: calc(var(--gui-width) * 0.12);
+	left: 0;
+
+	overflow-x: hidden;
+	overflow-y: scroll;
+
+	// display: grid;
+	// grid-template-columns: 100%;
+	// gap: calc(var(--gui-width) * 0.02);
+
+	h1 {
+		width: 100%;
+		height: calc(var(--gui-width) * 0.12);
+		line-height: calc(var(--gui-width) * 0.12);
+		font-size: calc(var(--gui-width) * 0.07);
+
+		font-family: __Nunito_a897b5,__Nunito_Fallback_a897b5;
+		color: #ffffff;
+		text-align: center;
+		margin: 0;
+	}
+	section {
+		width: 100%;
+		height: max-content;
+
+		padding: 0 calc(var(--gui-width) * 0.07);
+		display: grid;
+
+		grid-template-columns: 1fr 1fr;
+		gap: calc(var(--gui-width) * 0.02);
+
+		button {
+			width: 100%;
+			height: calc(var(--gui-width) * 0.1);
+
+			background: #f00;
+		}
+		.xmods-wide {
+			grid-column: 1 / -1;
+		}
+	}
+}
 `;
 document.head.appendChild(css);
 
@@ -140,26 +187,29 @@ gui.innerHTML = `
 	</div>
 	<div id="xmods-gui-main">
 		<h1>Global</h1>
-		<button>Example Action</button>
-		<button class="xmods-toggle">Example Toggle</button>
-		<button class="xmods-wide">Example Wide Action</button>
-		<div class="xmods-input">
-			<input type="text" placeholder="Example Input">
-			<button>GO</button>
-		</div>
-		<div class="xmods-select">
-			<select>
-				<option value="1">Example Select 1</option>
-				<option value="2">Example Select 2</option>
-				<option value="3">Example Select 3</option>
-			</select>
-		</div> <!-- TODO: Custom JS select with images and stuff -->
+		<section id="xmods-gui-global">
+			<button>Example Action</button>
+			<button class="xmods-toggle">Example Toggle</button>
+			<button class="xmods-wide">Example Wide Action</button>
+			<div class="xmods-input">
+				<input type="text" placeholder="Example Input">
+				<button>GO</button>
+			</div>
+			<div class="xmods-select">
+				<div class="xmods-option" value="1">Option 1</option>
+				<div class="xmods-option" value="2">Option 2</option>
+				<div class="xmods-option" value="3">Option 3</option>
+			</div> <!-- TODO: Custom JS select with images and stuff -->
+		</section>
 	</div>
 	<div id="xmods-gui-drag-bottom" class="xmods-gui-drag">
 		<p>Made By <span><a class="xmods-underlined" href="https://qwkdev.github.io/" target="_blank" aria-label="label">qwk<span class="xmods-underline" style="--widen: 10%; --fix: 5.5%;"></span></a></span></p>
 	</div>
 `;
 document.body.appendChild(gui);
+
+// only here for demo; will be generated
+gui.querySelector("#xmods-gui-main h1").onclick = e => guiCollapse(e.currentTarget, "global");
 
 // gui.addEventListener("mousemove", e => {
 // 	if (e.target.id === gui.id && e.buttons !== 0) {
@@ -189,6 +239,12 @@ document.addEventListener("mousemove", e => {
 		gui.style.top = `${e.clientY - guiOffsetY}px`;
 	}
 });
+
+window.guiCollapse = (label, id) => {
+	const section = document.getElementById(`xmods-gui-${id}`);
+	label.style.color = section.style.display === "none" ? "#fff" : "#bff";
+	section.style.display = section.style.display === "none" ? "block" : "none";
+}
 
 console.log("%c[XMODS] Injected successfully!", "color: #00ff00; font-weight: bold; font-size: 10px;");
 
