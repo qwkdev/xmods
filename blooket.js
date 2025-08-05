@@ -1,5 +1,7 @@
 (() => {
 
+const VERSION = "05.08.25";
+
 // if (document.getElementById("xmods-gui")) throw new Error("GUI already exists!");
 
 console.log("%c[XMODS] Injecting...", "color: #00ff00; font-size: 10px;");
@@ -66,9 +68,9 @@ css.textContent = `
 	width: var(--gui-width);
 	height: calc(var(--gui-width) * 1.5);
 
-	background: #00000a5a;
+	background: #00000a66;
 	backdrop-filter: blur(calc(var(--gui-width) * 0.02));
-	border: calc(var(--gui-width) * 0.01) solid #00000a11;
+	border: calc(var(--gui-width) * 0.01) solid #00000a1a;
 	border-radius: calc(var(--gui-width) * 0.06);
 }
 .xmods-gui-drag {
@@ -76,8 +78,7 @@ css.textContent = `
 	left: 0;
 	width: 100%;
 
-	background: #00000a11;
-	border-radius: calc(var(--gui-width) * 0.05);
+	background: #00000a1a;
 	border-radius: calc(var(--gui-width) * 0.05);
 
 	cursor: move;
@@ -150,6 +151,12 @@ css.textContent = `
 		color: #ffffff;
 		text-align: center;
 		margin: 0;
+
+		transition: .2s;
+
+		&:hover {
+			transform: scale(1.05);
+		}
 	}
 	section {
 		width: 100%;
@@ -165,7 +172,18 @@ css.textContent = `
 			width: 100%;
 			height: calc(var(--gui-width) * 0.1);
 
-			background: #f00;
+			font-size: calc(var(--gui-width) * 0.04);
+			color: #fff;
+			background: #ffffff1a;
+			border: calc(var(--gui-width) * 0.007) solid #ffffff2a;
+			border-radius: calc(var(--gui-width) * 0.02);
+
+			transition: .2s;
+
+			&:hover {
+				background: #ffffff2a;
+				border-color: #ffffff3a;
+			}
 		}
 		.xmods-wide {
 			grid-column: 1 / -1;
@@ -175,15 +193,14 @@ css.textContent = `
 `;
 document.head.appendChild(css);
 
-})();
-
-(() => {
+// })();
+// (() => {
 
 const gui = document.createElement("div");
 gui.id = "xmods-gui";
 gui.innerHTML = `
 	<div id="xmods-gui-drag-top" class="xmods-gui-drag">
-		<h1>Example Words<span>v1.2.3</span></h1>
+		<h1>Example Words<span>v${VERSION}</span></h1>
 	</div>
 	<div id="xmods-gui-main">
 		<h1>Global</h1>
@@ -243,7 +260,7 @@ document.addEventListener("mousemove", e => {
 window.guiCollapse = (label, id) => {
 	const section = document.getElementById(`xmods-gui-${id}`);
 	label.style.color = section.style.display === "none" ? "#fff" : "#bff";
-	section.style.display = section.style.display === "none" ? "block" : "none";
+	section.style.display = section.style.display === "none" ? "grid" : "none";
 }
 
 console.log("%c[XMODS] Injected successfully!", "color: #00ff00; font-weight: bold; font-size: 10px;");
