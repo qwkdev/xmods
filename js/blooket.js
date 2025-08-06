@@ -241,14 +241,6 @@ document.body.appendChild(gui);
 gui.querySelector("#xmods-gui-main h1").onclick = e => guiCollapse(e.currentTarget, "global");
 gui.querySelector("#xmods-gui-main #xmods-gui-global .xmods-toggle").onclick = e => { e.currentTarget.dataset.state = e.currentTarget.dataset.state === "0" ? "1" : "0"; };
 
-// gui.addEventListener("mousemove", e => {
-// 	if (e.target.id === gui.id && e.buttons !== 0) {
-// 		const rect = gui.getBoundingClientRect();
-// 		gui.style.top = `${e.clientY - rect.top}px`;
-// 		gui.style.left = `${e.clientX - rect.left}px`;
-// 	}
-// });
-
 let guiDragging = false;
 let guiOffsetX = 0;
 let guiOffsetY = 0;
@@ -257,13 +249,10 @@ const startGuiDrag = e => {
 	if (e.button === 0) {
 		e.preventDefault();
 		guiDragging = true;
+		
 		const guiRect = gui.getBoundingClientRect();
 		guiOffsetX = e.clientX - guiRect.left;
 		guiOffsetY = e.clientY - guiRect.top;
-
-		console.log(e);
-		console.log(e.target.getBoundingClientRect());
-		console.log(guiOffsetX, guiOffsetY);
 	}
 };
 gui.querySelector('#xmods-gui-drag-top').addEventListener("mousedown", e => startGuiDrag(e));
