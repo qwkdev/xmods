@@ -62,7 +62,7 @@ css.textContent = `
 	height: 100%;
 }
 .xmods-underlined::selection {
-	background: #ffffff55;
+	background: #ffffff44;
 }
 
 #xmods-gui {
@@ -102,6 +102,14 @@ css.textContent = `
 		span {
 			margin-left: calc(var(--gui-width) * 0.02);
 			font-size: calc(var(--gui-width) * 0.03);
+
+			&::selection {
+				background: #ffffff44;
+			}
+		}
+
+		&::selection {
+			background: #ffffff44;
 		}
 	}
 	p {
@@ -116,6 +124,10 @@ css.textContent = `
 		text-align: center;
 		margin: 0;
 		font-weight: 500;
+
+		&::selection {
+			background: #ffffff44;
+		}
 	}
 }
 #xmods-gui-drag-top {
@@ -156,12 +168,13 @@ css.textContent = `
 		text-align: center;
 		margin: 0;
 
-		pointer-events: none;
-
 		transition: .2s;
 
 		&:hover {
 			transform: scale(1.05);
+		}
+		&::selection {
+			background: #ffffff44;
 		}
 	}
 	section {
@@ -174,7 +187,7 @@ css.textContent = `
 		grid-template-columns: 1fr 1fr;
 		gap: calc(var(--gui-width) * 0.02);
 
-		button {
+		button, input {
 			width: 100%;
 			height: calc(var(--gui-width) * 0.1);
 
@@ -200,6 +213,77 @@ css.textContent = `
 		.xmods-wide {
 			grid-column: 1 / -1;
 		}
+
+		.xmods-input {
+			display: grid;
+			grid-template-columns: 4fr 1fr;
+
+			width: 100%;
+			height: calc(var(--gui-width) * 0.1);
+
+			input {
+				padding-left: calc(var(--gui-width) * 0.02);
+
+				border-top-right-radius: 0;
+				border-bottom-right-radius: 0;
+
+				&:focus {
+					outline: none;
+					border: calc(var(--gui-width) * 0.007) solid #ffffff55;
+				}
+				&::selection {
+					background: #ffffff44;
+				}
+			}
+			button {
+				position: relative;
+				border-top-left-radius: 0;
+				border-bottom-left-radius: 0;
+				border-left: none;
+
+				svg {
+					position: absolute;
+					top: 8%;
+					left: 10%;
+					width: 80%;
+					height: 80%;
+
+					path {
+						stroke: #fff;
+					}
+				}
+			}
+		}
+		.xmods-select {
+			display: grid;
+			grid-template-rows: 1fr 3fr;
+
+			.xmods-choice {
+				width: 100%;
+				height: calc(var(--gui-width) * 0.1);
+
+				background: #ffffff1a;
+				border: calc(var(--gui-width) * 0.007) solid #ffffff2a;
+				border-radius: calc(var(--gui-width) * 0.02);
+
+				background-position: center;
+				background-repeat: no-repeat;
+				background-size: cover;
+
+				transition: .2s;
+
+				&:hover {
+					background: #ffffff2a;
+					border-color: #ffffff3a;
+				}
+
+				svg {
+					path {
+						stroke: #fff;
+					}
+				}
+			}
+		}
 	}
 }
 `;
@@ -222,12 +306,18 @@ gui.innerHTML = `
 			<button class="xmods-wide">Example Wide Action</button>
 			<div class="xmods-input">
 				<input type="text" placeholder="Example Input">
-				<button>GO</button>
+				<button><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M4 12.6111L8.92308 17.5L20 6.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg></button>
 			</div>
 			<div class="xmods-select">
-				<div class="xmods-option" data-value="1">Option 1</option>
-				<div class="xmods-option" data-value="2">Option 2</option>
-				<div class="xmods-option" data-value="3">Option 3</option>
+				<div class="xmods-choice" style="background-image: url('https://media.blooket.com/image/upload/v1674539714/Banners/outerSpace.svg'); border: none;">
+					<p>None</p>
+					<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M7 10L12 15L17 10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>
+				</div>
+				<div class="xmods-options">
+					<div class="xmods-option" data-value="1">Option 1</div>
+					<div class="xmods-option" data-value="2">Option 2</div>
+					<div class="xmods-option" data-value="3">Option 3</div>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -247,9 +337,8 @@ let guiOffsetY = 0;
 
 const startGuiDrag = e => {
 	if (e.button === 0) {
-		e.preventDefault();
 		guiDragging = true;
-		
+
 		const guiRect = gui.getBoundingClientRect();
 		guiOffsetX = e.clientX - guiRect.left;
 		guiOffsetY = e.clientY - guiRect.top;
@@ -267,7 +356,7 @@ document.addEventListener("mousemove", e => {
 
 window.guiCollapse = (label, id) => {
 	const section = document.getElementById(`xmods-gui-${id}`);
-	label.style.color = section.style.display === "none" ? "#fff" : "#bff";
+	label.style.color = section.style.display === "none" ? "" : "#bff";
 	section.style.display = section.style.display === "none" ? "grid" : "none";
 }
 
