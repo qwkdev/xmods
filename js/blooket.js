@@ -1,8 +1,12 @@
 (() => {
 
-const VERSION = "05.08.25";
+const VERSION = "06.08.25";
 
 // if (document.getElementById("xmods-gui")) throw new Error("GUI already exists!");
+if (document.getElementById("xmods-gui")) {
+	document.getElementById('xmods-gui').remove();
+	document.getElementById('xmods-css').remove();
+}
 
 console.log("%c[XMODS] Injecting...", "color: #00ff00; font-size: 10px;");
 var wfcall = window.fetch.call;
@@ -152,6 +156,8 @@ css.textContent = `
 		text-align: center;
 		margin: 0;
 
+		pointer-events: none;
+
 		transition: .2s;
 
 		&:hover {
@@ -185,6 +191,12 @@ css.textContent = `
 				border-color: #ffffff3a;
 			}
 		}
+		.xmods-toggle[data-state="0"] {
+			background: #ff000066;
+		}
+		.xmods-toggle[data-state="1"] {
+			background: #00ff0033;
+		}
 		.xmods-wide {
 			grid-column: 1 / -1;
 		}
@@ -206,17 +218,17 @@ gui.innerHTML = `
 		<h1>Global</h1>
 		<section id="xmods-gui-global">
 			<button>Example Action</button>
-			<button class="xmods-toggle">Example Toggle</button>
+			<button data-state="0" class="xmods-toggle">Example Toggle</button>
 			<button class="xmods-wide">Example Wide Action</button>
 			<div class="xmods-input">
 				<input type="text" placeholder="Example Input">
 				<button>GO</button>
 			</div>
 			<div class="xmods-select">
-				<div class="xmods-option" value="1">Option 1</option>
-				<div class="xmods-option" value="2">Option 2</option>
-				<div class="xmods-option" value="3">Option 3</option>
-			</div> <!-- TODO: Custom JS select with images and stuff -->
+				<div class="xmods-option" data-value="1">Option 1</option>
+				<div class="xmods-option" data-value="2">Option 2</option>
+				<div class="xmods-option" data-value="3">Option 3</option>
+			</div>
 		</section>
 	</div>
 	<div id="xmods-gui-drag-bottom" class="xmods-gui-drag">
@@ -227,6 +239,7 @@ document.body.appendChild(gui);
 
 // only here for demo; will be generated
 gui.querySelector("#xmods-gui-main h1").onclick = e => guiCollapse(e.currentTarget, "global");
+gui.querySelector("#xmods-gui-main #xmods-gui-global .xmods-toggle").onclick = e => { e.currentTarget.dataset.state = e.currentTarget.dataset.state === "0" ? "1" : "0"; };
 
 // gui.addEventListener("mousemove", e => {
 // 	if (e.target.id === gui.id && e.buttons !== 0) {
@@ -242,13 +255,19 @@ let guiOffsetY = 0;
 
 const startGuiDrag = e => {
 	if (e.button === 0) {
+		e.preventDefault();
 		guiDragging = true;
-		guiOffsetX = e.layerX;
-		guiOffsetY = e.layerY;
+		const guiRect = gui.getBoundingClientRect();
+		guiOffsetX = e.clientX - guiRect.left;
+		guiOffsetY = e.clientY - guiRect.top;
+
+		console.log(e);
+		console.log(e.target.getBoundingClientRect());
+		console.log(guiOffsetX, guiOffsetY);
 	}
 };
-gui.querySelector('#xmods-gui-drag-top').addEventListener("mousedown", startGuiDrag);
-gui.querySelector('#xmods-gui-drag-bottom').addEventListener("mousedown", startGuiDrag);
+gui.querySelector('#xmods-gui-drag-top').addEventListener("mousedown", e => startGuiDrag(e));
+gui.querySelector('#xmods-gui-drag-bottom').addEventListener("mousedown", e => startGuiDrag(e));
 document.addEventListener("mouseup", () => { guiDragging = false; });
 document.addEventListener("mousemove", e => {
 	if (guiDragging) {
