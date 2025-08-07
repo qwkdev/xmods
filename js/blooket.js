@@ -1,6 +1,7 @@
 (() => {
 
-const VERSION = "06.08.25";
+//! TODO: Dynamically grab loaded blooket font (__Nunito_...)
+const VERSION = "07.08.25";
 
 // if (document.getElementById("xmods-gui")) throw new Error("GUI already exists!");
 if (document.getElementById("xmods-gui")) {
@@ -26,16 +27,10 @@ css.textContent = `
 :root {
 	--gui-width: 50vw;
 }
-// @font-face {
-// 	font-family: __Nunito_a897b5,__Nunito_Fallback_a897b5;
-// 	src: url('https://ac.blooket.com/play-frontend/7201455f0ac6125ab86bc14b705e1ccfb3cbb44d/_next/static/media/40d40f0f334d7ad1-s.p.woff2') format('woff2');
-// 	font-weight: normal;
-// 	font-style: normal;
-// }
 
 .xmods-underlined {
 	color: #fff;
-	font-family: __Nunito_a897b5,__Nunito_Fallback_a897b5;
+	font-family: __Nunito_357a22,__Nunito_Fallback_357a22;
 	font-weight: 500;
 	position: relative;
 	transition: .2s;
@@ -88,7 +83,7 @@ css.textContent = `
 	cursor: move;
 
 	h1 {
-		font-family: __Nunito_a897b5,__Nunito_Fallback_a897b5;
+		font-family: __Nunito_357a22,__Nunito_Fallback_357a22;
 		width: 100%;
 		position: absolute;
 		top: 47%;
@@ -113,7 +108,7 @@ css.textContent = `
 		}
 	}
 	p {
-		font-family: __Nunito_a897b5,__Nunito_Fallback_a897b5;
+		font-family: __Nunito_357a22,__Nunito_Fallback_357a22;
 		width: 100%;
 		position: absolute;
 		top: 55%;
@@ -163,7 +158,7 @@ css.textContent = `
 		line-height: calc(var(--gui-width) * 0.12);
 		font-size: calc(var(--gui-width) * 0.07);
 
-		font-family: __Nunito_a897b5,__Nunito_Fallback_a897b5;
+		font-family: __Nunito_357a22,__Nunito_Fallback_357a22;
 		color: #ffffff;
 		text-align: center;
 		margin: 0;
@@ -187,7 +182,7 @@ css.textContent = `
 		grid-template-columns: 1fr 1fr;
 		gap: calc(var(--gui-width) * 0.02);
 
-		button, input {
+		button, input[type="text"], input[type="number"] {
 			width: 100%;
 			height: calc(var(--gui-width) * 0.1);
 
@@ -198,17 +193,16 @@ css.textContent = `
 			border-radius: calc(var(--gui-width) * 0.02);
 
 			transition: .2s;
-
-			&:hover {
-				background: #ffffff2a;
-				border-color: #ffffff3a;
-			}
+		}
+		button:not(.xmods-choice):hover, input[type="text"]:hover, input[type="number"]:hover {
+			background: #ffffff2a;
+			border-color: #ffffff3a;
 		}
 		.xmods-toggle[data-state="0"] {
-			background: #ff000066;
+			background: #ff000066 !important;
 		}
 		.xmods-toggle[data-state="1"] {
-			background: #00ff0033;
+			background: #00ff0033 !important;
 		}
 		.xmods-wide {
 			grid-column: 1 / -1;
@@ -254,34 +248,182 @@ css.textContent = `
 				}
 			}
 		}
+		.xmods-input.xmods-toggle[data-state="0"] {
+			background: none !important;
+			input, button {
+				background: #ff000066;
+			}
+		}
+		.xmods-input.xmods-toggle[data-state="1"] {
+			background: none !important;
+			input, button {
+				background: #00ff0033;
+			}
+		}
+		.xmods-input.xmods-wide {
+			grid-template-columns: 8fr 1fr;
+		}
 		.xmods-select {
 			display: grid;
 			grid-template-rows: 1fr 3fr;
+			height: calc(var(--gui-width) * 0.1);
 
 			.xmods-choice {
+				position: relative;
+
 				width: 100%;
 				height: calc(var(--gui-width) * 0.1);
 
 				background: #ffffff1a;
-				border: calc(var(--gui-width) * 0.007) solid #ffffff2a;
+				border: none;
 				border-radius: calc(var(--gui-width) * 0.02);
 
+				background-size: cover;
 				background-position: center;
 				background-repeat: no-repeat;
-				background-size: cover;
-
+				
 				transition: .2s;
+
+				font-size: calc(var(--gui-width) * 0.04);
+				color: #fff;
+				text-align: left;
+				padding-left: calc(var(--gui-width) * 0.02);
+
+				p {
+					width: 0;
+				}
+
+				svg {
+					position: absolute;
+					top: calc(var(--gui-width) * 0.009);
+					right: calc(var(--gui-width) * 0.009);
+
+					width: calc(var(--gui-width) * 0.08);
+					height: calc(var(--gui-width) * 0.08);
+
+					path {
+						stroke: #fff;
+					}
+				}
+			}
+			.xmods-choice-no-img {
+				border: calc(var(--gui-width) * 0.007) solid #ffffff2a;
+
+				svg {
+					top: calc(var(--gui-width) * 0.005);
+					right: calc(var(--gui-width) * 0.005);
+				}
 
 				&:hover {
 					background: #ffffff2a;
 					border-color: #ffffff3a;
 				}
+			}
+			.xmods-options {
+				position: relative;
+				z-index: 2;
 
-				svg {
-					path {
-						stroke: #fff;
-					}
+				width: 100%;
+				height: calc(var(--gui-width) * 0.3);
+				overflow-x: hidden;
+				overflow-y: scroll;
+				
+				border-radius: calc(var(--gui-width) * 0.02);
+
+				background: #00001055;
+				backdrop-filter: blur(calc(var(--gui-width) * 0.01));
+
+				.xmods-option {
+					position: relative;
+
+					width: 100%;
+					height: calc(var(--gui-width) * 0.1);
+
+					background: none;
+					border: none;
+					border-radius: 0;
+
+					background-position: center;
+					background-repeat: no-repeat;
+					background-size: cover;
+
+					transition: .2s;
+
+					font-size: calc(var(--gui-width) * 0.04);
+					color: #fff;
+					text-align: left;
+					padding-left: calc(var(--gui-width) * 0.02);
 				}
+				.xmods-option-no-img:hover {
+					background: #ffffff11;
+				}
+			}
+		}
+		.xmods-slider {
+			width: 100%;
+			height: calc(var(--gui-width) * 0.1);
+
+			background: #ffffff1a;
+			border: calc(var(--gui-width) * 0.007) solid #ffffff2a;
+			border-radius: calc(var(--gui-width) * 0.02);
+
+			transition: .2s;
+
+			position: relative;
+
+			p {
+				position: absolute;
+				top: calc(var(--gui-width) * 0.002);
+				left: 0;
+
+				width: 100%;
+				margin: 0;
+				text-align: center;
+
+				font-size: calc(var(--gui-width) * 0.035);
+				color: #fff;
+			}
+			.xmods-range {
+				appearance: none;
+				-webkit-appearance: none;
+				background: transparent;
+				cursor: pointer;
+				width: 90%;
+				position: relative;
+				top: 70%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				--fill: 0%;
+			}
+			.xmods-range::-webkit-slider-runnable-track {
+				background: linear-gradient(to right, #ffffff88 var(--fill), #ffffff22 var(--fill)) !important;
+				border-radius: calc(var(--gui-width) * 0.02);
+				height: calc(var(--gui-width) * 0.02);
+			}
+			.xmods-range::-moz-range-track {
+				background: linear-gradient(to right, #ffffff88 var(--fill), #ffffff22 var(--fill)) !important;
+				border-radius: calc(var(--gui-width) * 0.02);
+				height: calc(var(--gui-width) * 0.02);
+			}
+			.xmods-range::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				appearance: none;
+				background-color: #fff;
+				border: none;
+				border-radius: 50%;
+				width: calc(var(--gui-width) * 0.03);
+				height: calc(var(--gui-width) * 0.03);
+			}
+			.xmods-range::-moz-range-thumb {
+				border: none;
+				border-radius: 50%;
+				background-color: #fff;
+				width: calc(var(--gui-width) * 0.03);
+				height: calc(var(--gui-width) * 0.03);
+			}
+			&:hover {
+				background: #ffffff2a;
+				border-color: #ffffff3a;
 			}
 		}
 	}
@@ -299,25 +441,49 @@ gui.innerHTML = `
 		<h1>Example Words<span>v${VERSION}</span></h1>
 	</div>
 	<div id="xmods-gui-main">
-		<h1>Global</h1>
-		<section id="xmods-gui-global">
+		<h1>Test</h1>
+		<section id="xmods-gui-test">
 			<button>Example Action</button>
 			<button data-state="0" class="xmods-toggle">Example Toggle</button>
-			<button class="xmods-wide">Example Wide Action</button>
 			<div class="xmods-input">
 				<input type="text" placeholder="Example Input">
 				<button><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M4 12.6111L8.92308 17.5L20 6.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg></button>
 			</div>
+			<div class="xmods-input xmods-toggle" data-state="0">
+				<input type="text" placeholder="Example Input">
+				<button><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M4 12.6111L8.92308 17.5L20 6.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg></button>
+			</div>
 			<div class="xmods-select">
-				<div class="xmods-choice" style="background-image: url('https://media.blooket.com/image/upload/v1674539714/Banners/outerSpace.svg'); border: none;">
+				<button class="xmods-choice xmods-choice-no-img"> <!-- style="background-image: url('https://media.blooket.com/image/upload/v1674539714/Banners/outerSpace.svg');" -->
 					<p>None</p>
 					<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M7 10L12 15L17 10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>
+				</button>
+				<div class="xmods-options" style="display: none;">
+					<button class="xmods-option xmods-option-no-img" data-value="1">Option 1</button>
+					<button class="xmods-option xmods-option-no-img" data-value="2">Option 2</button>
+					<button class="xmods-option xmods-option-no-img" data-value="3">Option 3</button>
+					<button class="xmods-option xmods-option-no-img" data-value="4">Option 4</button>
+					<button class="xmods-option xmods-option-no-img" data-value="5">Option 5</button>
+					<button class="xmods-option xmods-option-no-img" data-value="6">Option 6</button>
 				</div>
-				<div class="xmods-options">
-					<div class="xmods-option" data-value="1">Option 1</div>
-					<div class="xmods-option" data-value="2">Option 2</div>
-					<div class="xmods-option" data-value="3">Option 3</div>
+			</div>
+			<div class="xmods-select">
+				<button class="xmods-choice" style="background-image: url('https://media.blooket.com/image/upload/v1674539714/Banners/outerSpace.svg');">
+					<p>None</p>
+					<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M7 10L12 15L17 10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>
+				</button>
+				<div class="xmods-options" style="display: none;">
+					<button class="xmods-option xmods-option-no-img" data-value="1">Option 1</button>
+					<button class="xmods-option xmods-option-no-img" data-value="2">Option 2</button>
+					<button class="xmods-option xmods-option-no-img" data-value="3">Option 3</button>
+					<button class="xmods-option xmods-option-no-img" data-value="4">Option 4</button>
+					<button class="xmods-option xmods-option-no-img" data-value="5">Option 5</button>
+					<button class="xmods-option xmods-option-no-img" data-value="6">Option 6</button>
 				</div>
+			</div>
+			<div class="xmods-slider">
+				<p>GUI Size</p>
+				<input class="xmods-range" type="range" min="0" max="100" value="50" style="--fill: 50%">
 			</div>
 		</section>
 	</div>
@@ -328,8 +494,8 @@ gui.innerHTML = `
 document.body.appendChild(gui);
 
 // only here for demo; will be generated
-gui.querySelector("#xmods-gui-main h1").onclick = e => guiCollapse(e.currentTarget, "global");
-gui.querySelector("#xmods-gui-main #xmods-gui-global .xmods-toggle").onclick = e => { e.currentTarget.dataset.state = e.currentTarget.dataset.state === "0" ? "1" : "0"; };
+gui.querySelector("#xmods-gui-main h1").onclick = e => guiCollapse(e.currentTarget, "test");
+gui.querySelector("#xmods-gui-main #xmods-gui-test .xmods-toggle").onclick = e => { e.currentTarget.dataset.state = e.currentTarget.dataset.state === "0" ? "1" : "0"; };
 
 let guiDragging = false;
 let guiOffsetX = 0;
@@ -359,6 +525,111 @@ window.guiCollapse = (label, id) => {
 	label.style.color = section.style.display === "none" ? "" : "#bff";
 	section.style.display = section.style.display === "none" ? "grid" : "none";
 }
+
+const CHEATS = {
+	global: [
+		// {
+		// 	text: "Auto Answer",
+		// 	type: "toggle",
+		// 	enabled: false,
+		// 	data: null,
+		// 	run: function() {
+		// 		console.log('auto answer');
+		// 	}
+		// },
+		{
+			type: "button",
+			text: "Example Action",
+			state: 0,
+			run: function() {
+				console.log('Clicked button:', this.type, this.text, this.state);
+				this.state = this.state === 0 ? 1 : 0; // JUST AN EXAMPLE, USE A TOGGLE FOR TS
+			}
+		}, {
+			type: "toggle",
+			text: "Example Toggle",
+			state: 0,
+			run: function() {
+				console.log('Example Toggle', this.state);
+			}
+		}, {
+			type: "input",
+			wide: true,
+			text: "Wide Input",
+			run: function(value) {
+				console.log('Wide input', value);
+			}
+		}, {
+			type: "toggleinput",
+			text: "Example Input Toggle",
+			state: 0,
+			input: "number",
+			run: function(value) {
+				console.log('Example Toggle Input', this.state, value);
+			}
+		}, {
+			type: "select",
+			options: {
+				'starter': 'Default',
+				'fire': 'Fire',
+				'outerSpace': ['Outer Space', 'https://media.blooket.com/image/upload/v1674539714/Banners/outerSpace.svg'],
+				'ice': ['Ice', 'https://media.blooket.com/image/upload/v1674539714/Banners/ice.svg']
+			},
+			run: function(value) {
+				console.log('Wide input', value);
+			}
+		}, {
+			type: "slider",
+			wide: true,
+			text: "Example Slider",
+			min: 0,
+			max: 100,
+			value: 50,
+			run: function(value) {
+				console.log('Wide slider', value);
+			}
+		}
+	]
+};
+
+function generateUI(section) {
+	if (!(section in CHEATS)) return null;
+	if (document.querySelector(`#xmods-gui-${section.replace('_', '-')}`)) return null;
+
+	const mainUI = gui.querySelector('#xmods-gui-main');
+	const newHeader = document.createElement('h1');
+	newHeader.innerHTML = section.toLowerCase().split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+	newHeader.onclick = e => guiCollapse(e.currentTarget, section.replace('_', '-'));
+	mainUI.appendChild(newHeader);
+
+	const newUI = document.createElement('section');
+	newUI.id = `xmods-gui-${section.replace('_', '-')}`;
+	mainUI.appendChild(newUI);
+
+	CHEATS[section].forEach(cheat => {
+		switch (cheat.type) {
+			case 'button':
+				const ele = document.createElement('button');
+				ele.innerHTML = cheat.text;
+				ele.onclick = cheat.run.bind(cheat);
+				newUI.appendChild(ele);
+				break;
+			case 'toggle':
+				break;
+			case 'input':
+				break;
+			case 'toggleinput':
+				break;
+			case 'select':
+				break;
+			case 'slider':
+				break;
+			default:
+				console.warn(`Unknown UI element type: ${cheat.type}`);
+		}
+	});
+}
+generateUI('global');
 
 console.log("%c[XMODS] Injected successfully!", "color: #00ff00; font-weight: bold; font-size: 10px;");
 
