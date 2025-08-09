@@ -231,16 +231,24 @@ css.textContent = `
 	width: 100%;
 	height: calc(var(--gui-width) * 0.1);
 }
+#xmods-gui-main section .xmods-just-input {
+	width: 100%;
+	height: calc(var(--gui-width) * 0.1);
+}
+#xmods-gui-main section .xmods-just-input input {
+	padding-left: calc(var(--gui-width) * 0.02);
+	box-sizing: border-box;
+}
 #xmods-gui-main section .xmods-input input {
 	padding-left: calc(var(--gui-width) * 0.02);
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 }
-#xmods-gui-main section .xmods-input input:focus {
+#xmods-gui-main section .xmods-input input:focus, #xmods-gui-main section .xmods-just-input input:focus {
 	outline: none;
 	border: calc(var(--gui-width) * 0.007) solid #ffffff55;
 }
-#xmods-gui-main section .xmods-input input::selection {
+#xmods-gui-main section .xmods-input input::selection, #xmods-gui-main section .xmods-just-input input::selection {
 	background: #ffffff44;
 }
 #xmods-gui-main section .xmods-input button {
@@ -283,7 +291,7 @@ css.textContent = `
 	position: relative;
 	width: 100%;
 	height: calc(var(--gui-width) * 0.1);
-	background: #ffffff1a;
+	background-color: #ffffff1a;
 	border: none;
 	border-radius: calc(var(--gui-width) * 0.02);
 	background-size: cover;
@@ -294,6 +302,11 @@ css.textContent = `
 	color: #fff;
 	text-align: left;
 	padding-left: calc(var(--gui-width) * 0.02);
+}
+#xmods-gui-main section .xmods-select .xmods-blook-choice {
+	background-size: contain;
+	background-position: calc(100% - (var(--gui-width) * 0.09)) calc(var(--gui-width) * -0.005);
+	background-repeat: no-repeat;
 }
 #xmods-gui-main section .xmods-select .xmods-choice p {
 	width: 0;
@@ -311,15 +324,15 @@ css.textContent = `
 #xmods-gui-main section .xmods-select .xmods-choice svg path {
 	stroke: #fff;
 }
-#xmods-gui-main section .xmods-select .xmods-choice-no-img {
+#xmods-gui-main section .xmods-select .xmods-choice-no-img, #xmods-gui-main section .xmods-select .xmods-blook-choice {
 	border: calc(var(--gui-width) * 0.007) solid #ffffff2a;
 }
-#xmods-gui-main section .xmods-select .xmods-choice-no-img svg {
+#xmods-gui-main section .xmods-select .xmods-choice-no-img svg, #xmods-gui-main section .xmods-select .xmods-blook-choice svg {
 	top: calc(var(--gui-width) * 0.005);
 	right: calc(var(--gui-width) * 0.005);
 }
-#xmods-gui-main section .xmods-select .xmods-choice-no-img:hover {
-	background: #ffffff2a;
+#xmods-gui-main section .xmods-select .xmods-choice-no-img:hover, #xmods-gui-main section .xmods-select .xmods-blook-choice:hover {
+	background-color: #ffffff2a;
 	border-color: #ffffff3a;
 }
 #xmods-gui-main section .xmods-select .xmods-options {
@@ -332,6 +345,10 @@ css.textContent = `
 	border-radius: calc(var(--gui-width) * 0.02);
 	background: #00001055;
 	backdrop-filter: blur(calc(var(--gui-width) * 0.01));
+}
+#xmods-gui-main section .xmods-select .xmods-blook-options {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(calc(var(--gui-width) * 0.08), 1fr));
 }
 #xmods-gui-main section .xmods-select .xmods-options .xmods-option {
 	position: relative;
@@ -470,302 +487,319 @@ window.uiCollapse = (label, id) => {
 	section.style.display = section.style.display === "none" ? "grid" : "none";
 }
 
+function randomString(len) {
+	const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+	let result = '';
+	for (let i = 0; i < len; i++) {
+		result += characters.charAt(Math.floor(Math.random() * characters.length));
+	}
+	return result;
+}
+function randomNumbers(len) {
+	const characters = '0123456789';
+	let result = '';
+	for (let i = 0; i < len; i++) {
+		result += characters.charAt(Math.floor(Math.random() * characters.length));
+	}
+	return result;
+}
+
 const COSMETIC_OPTIONS = {
 	blooks: {
-		"chick":              ["Chick",                "https://ac.blooket.com/marketassets/blooks/chick.svg"],
-		"chicken":            ["Chicken",              "https://ac.blooket.com/marketassets/blooks/chicken.svg"],
-		"cow":                ["Cow",                  "https://ac.blooket.com/marketassets/blooks/cow.svg"],
-		"goat":               ["Goat",                 "https://ac.blooket.com/marketassets/blooks/goat.svg"],
-		"horse":              ["Horse",                "https://ac.blooket.com/marketassets/blooks/horse.svg"],
-		"pig":                ["Pig",                  "https://ac.blooket.com/marketassets/blooks/pig.svg"],
-		"sheep":              ["Sheep",                "https://ac.blooket.com/marketassets/blooks/sheep.svg"],
-		"duck":               ["Duck",                 "https://ac.blooket.com/marketassets/blooks/duck.svg"],
-		"alpaca":             ["Alpaca",               "https://ac.blooket.com/marketassets/blooks/alpaca.svg"],
-		"dog":                ["Dog",                  "https://ac.blooket.com/marketassets/blooks/dog.svg"],
-		"cat":                ["Cat",                  "https://ac.blooket.com/marketassets/blooks/cat.svg"],
-		"rabbit":             ["Rabbit",               "https://ac.blooket.com/marketassets/blooks/rabbit.svg"],
-		"goldfish":           ["Goldfish",             "https://ac.blooket.com/marketassets/blooks/goldfish.svg"],
-		"hamster":            ["Hamster",              "https://ac.blooket.com/marketassets/blooks/hamster.svg"],
-		"turtle":             ["Turtle",               "https://ac.blooket.com/marketassets/blooks/turtle.svg"],
-		"kitten":             ["Kitten",               "https://ac.blooket.com/marketassets/blooks/kitten.svg"],
-		"puppy":              ["Puppy",                "https://ac.blooket.com/marketassets/blooks/puppy.svg"],
-		"bear":               ["Bear",                 "https://ac.blooket.com/marketassets/blooks/bear.svg"],
-		"moose":              ["Moose",                "https://ac.blooket.com/marketassets/blooks/moose.svg"],
-		"fox":                ["Fox",                  "https://ac.blooket.com/marketassets/blooks/fox.svg"],
-		"raccoon":            ["Raccoon",              "https://ac.blooket.com/marketassets/blooks/raccoon.svg"],
-		"squirrel":           ["Squirrel",             "https://ac.blooket.com/marketassets/blooks/squirrel.svg"],
-		"owl":                ["Owl",                  "https://ac.blooket.com/marketassets/blooks/owl.svg"],
-		"hedgehog":           ["Hedgehog",             "https://ac.blooket.com/marketassets/blooks/hedgehog.svg"],
-		"deer":               ["Deer",                 "https://ac.blooket.com/marketassets/blooks/deer.svg"],
-		"wolf":               ["Wolf",                 "https://ac.blooket.com/marketassets/blooks/wolf.svg"],
-		"beaver":             ["Beaver",               "https://ac.blooket.com/marketassets/blooks/beaver.svg"],
-		"tiger":              ["Tiger",                "https://ac.blooket.com/marketassets/blooks/tiger.svg"],
-		"orangutan":          ["Orangutan",            "https://ac.blooket.com/marketassets/blooks/orangutan.svg"],
-		"cockatoo":           ["Cockatoo",             "https://ac.blooket.com/marketassets/blooks/cockatoo.svg"],
-		"parrot":             ["Parrot",               "https://ac.blooket.com/marketassets/blooks/parrot.svg"],
-		"anaconda":           ["Anaconda",             "https://ac.blooket.com/marketassets/blooks/anaconda.svg"],
-		"jaguar":             ["Jaguar",               "https://ac.blooket.com/marketassets/blooks/jaguar.svg"],
-		"macaw":              ["Macaw",                "https://ac.blooket.com/marketassets/blooks/macaw.svg"],
-		"toucan":             ["Toucan",               "https://ac.blooket.com/marketassets/blooks/toucan.svg"],
-		"panther":            ["Panther",              "https://ac.blooket.com/marketassets/blooks/panther.svg"],
-		"capuchinmonkey":     ["Capuchin",             "https://ac.blooket.com/marketassets/blooks/capuchinmonkey.svg"],
-		"gorilla":            ["Gorilla",              "https://ac.blooket.com/marketassets/blooks/gorilla.svg"],
-		"hippo":              ["Hippo",                "https://ac.blooket.com/marketassets/blooks/hippo.svg"],
-		"rhino":              ["Rhino",                "https://ac.blooket.com/marketassets/blooks/rhino.svg"],
-		"giraffe":            ["Giraffe",              "https://ac.blooket.com/marketassets/blooks/giraffe.svg"],
-		"snowyowl":           ["Snowy Owl",            "https://ac.blooket.com/marketassets/blooks/snowyowl.svg"],
-		"polarbear":          ["Polar Bear",           "https://ac.blooket.com/marketassets/blooks/polarbear.svg"],
-		"arcticfox":          ["Arctic Fox",           "https://ac.blooket.com/marketassets/blooks/arcticfox.svg"],
-		"babypenguin":        ["Baby Penguin",         "https://ac.blooket.com/marketassets/blooks/babypenguin.svg"],
-		"penguin":            ["Penguin",              "https://ac.blooket.com/marketassets/blooks/penguin.svg"],
-		"arctichare":         ["Arctic Hare",          "https://ac.blooket.com/marketassets/blooks/arctichare.svg"],
-		"seal":               ["Seal",                 "https://ac.blooket.com/marketassets/blooks/seal.svg"],
-		"walrus":             ["Walrus",               "https://ac.blooket.com/marketassets/blooks/walrus.svg"],
-		"witch":              ["Witch",                "https://ac.blooket.com/marketassets/blooks/witch.svg"],
-		"wizard":             ["Wizard",               "https://ac.blooket.com/marketassets/blooks/wizard.svg"],
-		"elf":                ["Elf",                  "https://ac.blooket.com/marketassets/blooks/elf.svg"],
-		"fairy":              ["Fairy",                "https://ac.blooket.com/marketassets/blooks/fairy.svg"],
-		"slimemonster":       ["Slime Monster",        "https://ac.blooket.com/marketassets/blooks/slimemonster.svg"],
-		"jester":             ["Jester",               "https://ac.blooket.com/marketassets/blooks/jester.svg"],
-		"dragon":             ["Dragon",               "https://ac.blooket.com/marketassets/blooks/dragon.svg"],
-		"queen":              ["Queen",                "https://ac.blooket.com/marketassets/blooks/queen.svg"],
-		"unicorn":            ["Unicorn",              "https://ac.blooket.com/marketassets/blooks/unicorn.svg"],
-		"king":               ["King",                 "https://ac.blooket.com/marketassets/blooks/king.svg"],
-		"twoofspades":        ["Two of Spades",        "https://ac.blooket.com/marketassets/blooks/twoofspades.svg"],
-		"eat":                ["Eat Me",               "https://ac.blooket.com/marketassets/blooks/eat.svg"],
-		"drink":              ["Drink Me",             "https://ac.blooket.com/marketassets/blooks/drink.svg"],
-		"alice":              ["Alice",                "https://ac.blooket.com/marketassets/blooks/alice.svg"],
-		"queenofhearts":      ["Queen of Hearts",      "https://ac.blooket.com/marketassets/blooks/queenofhearts.svg"],
-		"dormouse":           ["Dormouse",             "https://ac.blooket.com/marketassets/blooks/dormouse.svg"],
-		"whiterabbit":        ["White Rabbit",         "https://ac.blooket.com/marketassets/blooks/whiterabbit.svg"],
-		"cheshirecat":        ["Cheshire Cat",         "https://ac.blooket.com/marketassets/blooks/cheshirecat.svg"],
-		"caterpillar":        ["Caterpillar",          "https://ac.blooket.com/marketassets/blooks/caterpillar.svg"],
-		"madhatter":          ["Mad Hatter",           "https://ac.blooket.com/marketassets/blooks/madhatter.svg"],
-		"kingofhearts":       ["King of Hearts",       "https://ac.blooket.com/marketassets/blooks/kingofhearts.svg"],
-		"toast":              ["Toast",                "https://ac.blooket.com/marketassets/blooks/toast.svg"],
-		"cereal":             ["Cereal",               "https://ac.blooket.com/marketassets/blooks/cereal.svg"],
-		"yogurt":             ["Yogurt",               "https://ac.blooket.com/marketassets/blooks/yogurt.svg"],
-		"breakfastcombo":     ["Breakfast Combo",      "https://ac.blooket.com/marketassets/blooks/breakfastcombo.svg"],
-		"orangejuice":        ["Orange Juice",         "https://ac.blooket.com/marketassets/blooks/orangejuice.svg"],
-		"milk":               ["Milk",                 "https://ac.blooket.com/marketassets/blooks/milk.svg"],
-		"waffle":             ["Waffle",               "https://ac.blooket.com/marketassets/blooks/waffle.svg"],
-		"pancakes":           ["Pancakes",             "https://ac.blooket.com/marketassets/blooks/pancakes.svg"],
-		"frenchtoast":        ["French Toast",         "https://ac.blooket.com/marketassets/blooks/frenchtoast.svg"],
-		"pizza":              ["Pizza",                "https://ac.blooket.com/marketassets/blooks/pizza.svg"],
-		"earth":              ["Earth",                "https://ac.blooket.com/marketassets/blooks/earth.svg"],
-		"meteor":             ["Meteor",               "https://ac.blooket.com/marketassets/blooks/meteor.svg"],
-		"stars":              ["Stars",                "https://ac.blooket.com/marketassets/blooks/stars.svg"],
-		"alien":              ["Alien",                "https://ac.blooket.com/marketassets/blooks/alien.svg"],
-		"planet":             ["Planet",               "https://ac.blooket.com/marketassets/blooks/planet.svg"],
-		"ufo":                ["UFO",                  "https://ac.blooket.com/marketassets/blooks/ufo.svg"],
-		"spaceship":          ["Spaceship",            "https://ac.blooket.com/marketassets/blooks/spaceship.svg"],
-		"astronaut":          ["Astronaut",            "https://ac.blooket.com/marketassets/blooks/astronaut.svg"],
-		"lilbot":             ["Lil Bot",              "https://ac.blooket.com/marketassets/blooks/lilbot.svg"],
-		"lovelybot":          ["Lovely Bot",           "https://ac.blooket.com/marketassets/blooks/lovelybot.svg"],
-		"angrybot":           ["Angry Bot",            "https://ac.blooket.com/marketassets/blooks/angrybot.svg"],
-		"happybot":           ["Happy Bot",            "https://ac.blooket.com/marketassets/blooks/happybot.svg"],
-		"watson":             ["Watson",               "https://ac.blooket.com/marketassets/blooks/watson.svg"],
-		"buddybot":           ["Buddy Bot",            "https://ac.blooket.com/marketassets/blooks/buddybot.svg"],
-		"brainybot":          ["Brainy Bot",           "https://ac.blooket.com/marketassets/blooks/brainybot.svg"],
-		"megabot":            ["Mega Bot",             "https://ac.blooket.com/marketassets/blooks/megabot.svg"],
-		"oldboot":            ["Old Boot",             "https://ac.blooket.com/marketassets/blooks/oldboot.svg"],
-		"jellyfish":          ["Jellyfish",            "https://ac.blooket.com/marketassets/blooks/jellyfish.svg"],
-		"clownfish":          ["Clownfish",            "https://ac.blooket.com/marketassets/blooks/clownfish.svg"],
-		"frog":               ["Frog",                 "https://ac.blooket.com/marketassets/blooks/frog.svg"],
-		"crab":               ["Crab",                 "https://ac.blooket.com/marketassets/blooks/crab.svg"],
-		"pufferfish":         ["Pufferfish",           "https://ac.blooket.com/marketassets/blooks/pufferfish.svg"],
-		"blobfish":           ["Blobfish",             "https://ac.blooket.com/marketassets/blooks/blobfish.svg"],
-		"octopus":            ["Octopus",              "https://ac.blooket.com/marketassets/blooks/octopus.svg"],
-		"narwhal":            ["Narwhal",              "https://ac.blooket.com/marketassets/blooks/narwhal.svg"],
-		"dolphin":            ["Dolphin",              "https://ac.blooket.com/marketassets/blooks/dolphin.svg"],
-		"babyshark":          ["Baby Shark",           "https://ac.blooket.com/marketassets/blooks/babyshark.svg"],
-		"megalodon":          ["Megalodon",            "https://ac.blooket.com/marketassets/blooks/megalodon.svg"],
-		"panda":              ["Panda",                "https://ac.blooket.com/marketassets/blooks/panda.svg"],
-		"sloth":              ["Sloth",                "https://ac.blooket.com/marketassets/blooks/sloth.svg"],
-		"tenrec":             ["Tenrec",               "https://ac.blooket.com/marketassets/blooks/tenrec.svg"],
-		"flamingo":           ["Flamingo",             "https://ac.blooket.com/marketassets/blooks/flamingo.svg"],
-		"zebra":              ["Zebra",                "https://ac.blooket.com/marketassets/blooks/zebra.svg"],
-		"elephant":           ["Elephant",             "https://ac.blooket.com/marketassets/blooks/elephant.svg"],
-		"lemur":              ["Lemur",                "https://ac.blooket.com/marketassets/blooks/lemur.svg"],
-		"peacock":            ["Peacock",              "https://ac.blooket.com/marketassets/blooks/peacock.svg"],
-		"chameleon":          ["Chameleon",            "https://ac.blooket.com/marketassets/blooks/chameleon.svg"],
-		"lion":               ["Lion",                 "https://ac.blooket.com/marketassets/blooks/lion.svg"],
-		"amber":              ["Amber",                "https://ac.blooket.com/marketassets/blooks/amber.svg"],
-		"dinoegg":            ["Dino Egg",             "https://ac.blooket.com/marketassets/blooks/dinoegg.svg"],
-		"dinofossil":         ["Dino Fossil",          "https://ac.blooket.com/marketassets/blooks/dinofossil.svg"],
-		"stegosaurus":        ["Stegosaurus",          "https://ac.blooket.com/marketassets/blooks/stegosaurus.svg"],
-		"velociraptor":       ["Velociraptor",         "https://ac.blooket.com/marketassets/blooks/velociraptor.svg"],
-		"brontosaurus":       ["Brontosaurus",         "https://ac.blooket.com/marketassets/blooks/brontosaurus.svg"],
-		"triceratops":        ["Triceratops",          "https://ac.blooket.com/marketassets/blooks/triceratops.svg"],
-		"tyrannosaurusrex":   ["Tyrannosaurus Rex",    "https://ac.blooket.com/marketassets/blooks/tyrannosaurusrex.svg"],
-		"icebat":             ["Ice Bat",              "https://ac.blooket.com/marketassets/blooks/icebat.svg"],
-		"icebug":             ["Ice Bug",              "https://ac.blooket.com/marketassets/blooks/icebug.svg"],
-		"iceelemental":       ["Ice Elemental",        "https://ac.blooket.com/marketassets/blooks/iceelemental.svg"],
-		"rockmonster":        ["Rock Monster",         "https://ac.blooket.com/marketassets/blooks/rockmonster.svg"],
-		"dink":               ["Ding",                 "https://ac.blooket.com/marketassets/blooks/dink.svg"],
-		"donk":               ["Donk",                 "https://ac.blooket.com/marketassets/blooks/donk.svg"],
-		"bushmonster":        ["Bush Monster",         "https://ac.blooket.com/marketassets/blooks/bushmonster.svg"],
-		"yeti":               ["Yeti",                 "https://ac.blooket.com/marketassets/blooks/yeti.svg"],
-		"dingo":              ["Dingo",                "https://ac.blooket.com/marketassets/blooks/dingo.svg"],
-		"echidna":            ["Echidna",              "https://ac.blooket.com/marketassets/blooks/echidna.svg"],
-		"koala":              ["Koala",                "https://ac.blooket.com/marketassets/blooks/koala.svg"],
-		"kookaburra":         ["Kookaburra",           "https://ac.blooket.com/marketassets/blooks/kookaburra.svg"],
-		"platypus":           ["Platypus",             "https://ac.blooket.com/marketassets/blooks/platypus.svg"],
-		"joey":               ["Joey",                 "https://ac.blooket.com/marketassets/blooks/joey.svg"],
-		"kangaroo":           ["Kangaroo",             "https://ac.blooket.com/marketassets/blooks/kangaroo.svg"],
-		"crocodile":          ["Crocodile",            "https://ac.blooket.com/marketassets/blooks/crocodile.svg"],
-		"sugarglider":        ["Sugar Glider",         "https://ac.blooket.com/marketassets/blooks/sugarglider.svg"],
-		"deckhand":           ["Deckhand",             "https://ac.blooket.com/marketassets/blooks/deckhand.svg"],
-		"buccaneer":          ["Buccaneer",            "https://ac.blooket.com/marketassets/blooks/buccaneer.svg"],
-		"swashbuckler":       ["Swashbuckler",         "https://ac.blooket.com/marketassets/blooks/swashbuckler.svg"],
-		"treasuremap":        ["Treasure Map",         "https://ac.blooket.com/marketassets/blooks/treasuremap.svg"],
-		"seagull":            ["Seagull",              "https://ac.blooket.com/marketassets/blooks/seagull.svg"],
-		"jollypirate":        ["Jolly Pirate",         "https://ac.blooket.com/marketassets/blooks/jollypirate.svg"],
-		"pirateship":         ["Pirate Ship",          "https://ac.blooket.com/marketassets/blooks/pirateship.svg"],
-		"kraken":             ["Kraken",               "https://ac.blooket.com/marketassets/blooks/kraken.svg"],
-		"captainblackbeard":  ["Captain Blackbeard",   "https://ac.blooket.com/marketassets/blooks/captainblackbeard.svg"],
-		"ant":                ["Ant",                  "https://ac.blooket.com/marketassets/blooks/ant.svg"],
-		"rhinobeetle":        ["Rhino Beetle",         "https://ac.blooket.com/marketassets/blooks/rhinobeetle.svg"],
-		"ladybug":            ["Ladybug",              "https://ac.blooket.com/marketassets/blooks/ladybug.svg"],
-		"fly":                ["Fly",                  "https://ac.blooket.com/marketassets/blooks/fly.svg"],
-		"worm":               ["Worm",                 "https://ac.blooket.com/marketassets/blooks/worm.svg"],
-		"bee":                ["Bee",                  "https://ac.blooket.com/marketassets/blooks/bee.svg"],
-		"mantis":             ["Mantis",               "https://ac.blooket.com/marketassets/blooks/mantis.svg"],
-		"butterfly":          ["Butterfly",            "https://ac.blooket.com/marketassets/blooks/butterfly.svg"],
-		"pumpkin":            ["Pumpkin",              "https://ac.blooket.com/marketassets/blooks/pumpkin.svg"],
-		"swampmonster":       ["Swamp Monster",        "https://ac.blooket.com/marketassets/blooks/swampmonster.svg"],
-		"frankenstein":       ["Frankenstein",         "https://ac.blooket.com/marketassets/blooks/frankenstein.svg"],
-		"vampire":            ["Vampire",              "https://ac.blooket.com/marketassets/blooks/vampire.svg"],
-		"zombie":             ["Zombie",               "https://ac.blooket.com/marketassets/blooks/zombie.svg"],
-		"mummy":              ["Mummy",                "https://ac.blooket.com/marketassets/blooks/mummy.svg"],
-		"caramelapple2":      ["Caramel Apple",        "https://ac.blooket.com/marketassets/blooks/caramelapple2.svg"],
-		"candycorn":          ["Candy Corn",           "https://ac.blooket.com/marketassets/blooks/candycorn.svg"],
-		"crow":               ["Crow",                 "https://ac.blooket.com/marketassets/blooks/crow.svg"],
-		"werewolf":           ["Werewolf",             "https://ac.blooket.com/marketassets/blooks/werewolf.svg"],
-		"ghost":              ["Ghost",                "https://ac.blooket.com/marketassets/blooks/ghost.svg"],
-		"blackbear":          ["Black Bear",           "https://ac.blooket.com/marketassets/blooks/blackbear.svg"],
-		"pumpkinpie":         ["Pumpkin Pie",          "https://ac.blooket.com/marketassets/blooks/pumpkinpie.svg"],
-		"chipmunk":           ["Chipmunk",             "https://ac.blooket.com/marketassets/blooks/chipmunk.svg"],
-		"cornucopia":         ["Cornucopia",           "https://ac.blooket.com/marketassets/blooks/cornucopia.svg"],
-		"autumncat":          ["Autumn Cat",           "https://ac.blooket.com/marketassets/blooks/autumncat.svg"],
-		"pumpkinpuppy":       ["Pumpkin Puppy",        "https://ac.blooket.com/marketassets/blooks/pumpkinpuppy.svg"],
-		"autumncrow":         ["Autumn Crow",          "https://ac.blooket.com/marketassets/blooks/autumncrow.svg"],
-		"turkey":             ["Turkey",               "https://ac.blooket.com/marketassets/blooks/turkey.svg"],
-		"snowglobe":          ["Snow Globe",           "https://ac.blooket.com/marketassets/blooks/snowglobe.svg"],
-		"holidaygift":        ["Holiday Gift",         "https://ac.blooket.com/marketassets/blooks/holidaygift.svg"],
-		"hotchocolate":       ["Hot Chocolate",        "https://ac.blooket.com/marketassets/blooks/hotchocolate.svg"],
-		"holidaywreath":      ["Holiday Wreath",       "https://ac.blooket.com/marketassets/blooks/holidaywreath.svg"],
-		"stocking":           ["Stocking",             "https://ac.blooket.com/marketassets/blooks/stocking.svg"],
-		"gingerbreadman":     ["Gingerbread Man",      "https://ac.blooket.com/marketassets/blooks/gingerbreadman.svg"],
-		"gingerbreadhouse":   ["Gingerbread House",    "https://ac.blooket.com/marketassets/blooks/gingerbreadhouse.svg"],
-		"reindeer":           ["Reindeer",             "https://ac.blooket.com/marketassets/blooks/reindeer.svg"],
-		"snowman":            ["Snowman",              "https://ac.blooket.com/marketassets/blooks/snowman.svg"],
-		"santaclaus":         ["Santa Claus",          "https://ac.blooket.com/marketassets/blooks/santaclaus.svg"],
-		"rainbowjellyfish":   ["Rainbow Jellyfish",    "https://ac.blooket.com/marketassets/blooks/rainbowjellyfish.svg"],
-		"blizzardclownfish":  ["Blizzard Clownfish",   "https://ac.blooket.com/marketassets/blooks/blizzardclownfish.svg"],
-		"lovelyfrog":         ["Lovely Frog",          "https://ac.blooket.com/marketassets/blooks/lovelyfrog.svg"],
-		"luckyfrog":          ["Lucky Frog",           "https://ac.blooket.com/marketassets/blooks/luckyfrog.svg"],
-		"springfrog":         ["Spring Frog",          "https://ac.blooket.com/marketassets/blooks/springfrog.svg"],
-		"poisondartfrog":     ["Poison Dart Frog",     "https://ac.blooket.com/marketassets/blooks/poisondartfrog.svg"],
-		"luckyhamster":       ["Lucky Hamster",        "https://ac.blooket.com/marketassets/blooks/luckyhamster.svg"],
-		"luckybee":           ["Lucky Bee",            "https://ac.blooket.com/marketassets/blooks/luckybee.svg"],
-		"chocolaterabbit":    ["Chocolate Rabbit",     "https://ac.blooket.com/marketassets/blooks/chocolaterabbit.svg"],
-		"springrabbit":       ["Spring Rabbit",        "https://ac.blooket.com/marketassets/blooks/springrabbit.svg"],
-		"springdeer":         ["Spring Deer",          "https://ac.blooket.com/marketassets/blooks/springdeer.svg"],
-		"lemoncrab":          ["Lemon Crab",           "https://ac.blooket.com/marketassets/blooks/lemoncrab.svg"],
-		"piratepufferfish":   ["Pirate Pufferfish",    "https://ac.blooket.com/marketassets/blooks/piratepufferfish.svg"],
-		"donutblobfish":      ["Donut Blobfish",       "https://ac.blooket.com/marketassets/blooks/donutblobfish.svg"],
-		"crimsonoctopus":     ["Crimson Octopus",      "https://ac.blooket.com/marketassets/blooks/crimsonoctopus.svg"],
-		"rainbownarwhal":     ["Rainbow Narwhal",      "https://ac.blooket.com/marketassets/blooks/rainbownarwhal.svg"],
-		"frostwreath":        ["Frost Wreath",         "https://ac.blooket.com/marketassets/blooks/frostwreath.svg"],
-		"tropicalglobe":      ["Tropical Globe",       "https://ac.blooket.com/marketassets/blooks/tropicalglobe.svg"],
-		"newyorksnowglobe":   ["New York Snow Globe",  "https://ac.blooket.com/marketassets/blooks/newyorksnowglobe.svg"],
-		"londonsnowglobe":    ["London Snow Globe",    "https://ac.blooket.com/marketassets/blooks/londonsnowglobe.svg"],
-		"japansnowglobe":     ["Japan Snow Globe",     "https://ac.blooket.com/marketassets/blooks/japansnowglobe.svg"],
-		"egyptsnowglobe":     ["Egypt Snow Globe",     "https://ac.blooket.com/marketassets/blooks/egyptsnowglobe.svg"],
-		"parissnowglobe":     ["Paris Snow Globe",     "https://ac.blooket.com/marketassets/blooks/parissnowglobe.svg"],
-		"redsweatersnowman":  ["Red Sweater Snowman",  "https://ac.blooket.com/marketassets/blooks/redsweatersnowman.svg"],
-		"bluesweatersnowman": ["Blue Sweater Snowman", "https://ac.blooket.com/marketassets/blooks/bluesweatersnowman.svg"],
-		"elfsweatersnowman":  ["Elf Sweater Snowman",  "https://ac.blooket.com/marketassets/blooks/elfsweatersnowman.svg"],
-		"holidayelf":         ["Holiday Elf",          "https://ac.blooket.com/marketassets/blooks/holidayelf.svg"],
-		"cozybabypenguin":    ["Cozy Baby Penguin",    "https://ac.blooket.com/marketassets/blooks/cozybabypenguin.svg"],
-		"santaclaws":         ["Santa Claws",          "https://ac.blooket.com/marketassets/blooks/santaclaws.svg"],
-		"cookiescombo":       ["Cookies Combo",        "https://ac.blooket.com/marketassets/blooks/cookiescombo.svg"],
-		"chillyflamingo":     ["Chilly Flamingo",      "https://ac.blooket.com/marketassets/blooks/chillyflamingo.svg"],
-		"snowybushmonster":   ["Snowy Bush Monster",   "https://ac.blooket.com/marketassets/blooks/snowybushmonster.svg"],
-		"nutcrackerkoala":    ["Nutcracker Koala",     "https://ac.blooket.com/marketassets/blooks/nutcrackerkoala.svg"],
-		"sandwich":           ["Sandwich",             "https://ac.blooket.com/marketassets/blooks/sandwich.svg"],
-		"iceslime":           ["Ice Slime",            "https://ac.blooket.com/marketassets/blooks/iceslime.svg"],
-		"frozenfossil":       ["Frozen Fossil",        "https://ac.blooket.com/marketassets/blooks/frozenfossil.svg"],
-		"icecrab":            ["Ice Crab",             "https://ac.blooket.com/marketassets/blooks/icecrab.svg"],
-		"rainbowpanda":       ["Rainbow Panda",        "https://ac.blooket.com/marketassets/blooks/rainbowpanda.svg"],
-		"whitepeacock":       ["White Peacock",        "https://ac.blooket.com/marketassets/blooks/whitepeacock.svg"],
-		"tigerzebra":         ["Tiger Zebra",          "https://ac.blooket.com/marketassets/blooks/tigerzebra.svg"],
-		"tealplatypus":       ["Teal Platypus",        "https://ac.blooket.com/marketassets/blooks/tealplatypus.svg"],
-		"goldenpumpkinpie":   ["Golden Pumpkin Pie",   "https://ac.blooket.com/marketassets/blooks/goldenpumpkinpie.svg"],
-		"bluebutterfly":      ["Blue Butterfly",       "https://ac.blooket.com/marketassets/blooks/bluebutterfly.svg"],
-		"redastronaut":       ["Red Astronaut",        "https://ac.blooket.com/marketassets/blooks/redastronaut.svg"],
-		"orangeastronaut":    ["Orange Astronaut",     "https://ac.blooket.com/marketassets/blooks/orangeastronaut.svg"],
-		"yellowastronaut":    ["Yellow Astronaut",     "https://ac.blooket.com/marketassets/blooks/yellowastronaut.svg"],
-		"limeastronaut":      ["Lime Astronaut",       "https://ac.blooket.com/marketassets/blooks/limeastronaut.svg"],
-		"greenastronaut":     ["Green Astronaut",      "https://ac.blooket.com/marketassets/blooks/greenastronaut.svg"],
-		"cyanastronaut":      ["Cyan Astronaut",       "https://ac.blooket.com/marketassets/blooks/cyanastronaut.svg"],
-		"blueastronaut":      ["Blue Astronaut",       "https://ac.blooket.com/marketassets/blooks/blueastronaut.svg"],
-		"pinkastronaut":      ["Pink Astronaut",       "https://ac.blooket.com/marketassets/blooks/pinkastronaut.svg"],
-		"purpleastronaut":    ["Purple Astronaut",     "https://ac.blooket.com/marketassets/blooks/purpleastronaut.svg"],
-		"brownastronaut":     ["Brown Astronaut",      "https://ac.blooket.com/marketassets/blooks/brownastronaut.svg"],
-		"blackastronaut":     ["Black Astronaut",      "https://ac.blooket.com/marketassets/blooks/blackastronaut.svg"],
-		"lovelyplanet":       ["Lovely Planet",        "https://ac.blooket.com/marketassets/blooks/lovelyplanet.svg"],
-		"lovelypeacock":      ["Lovely Peacock",       "https://ac.blooket.com/marketassets/blooks/lovelypeacock.svg"],
-		"lovelyfox":          ["Lovely Fox",           "https://ac.blooket.com/marketassets/blooks/lovelyfox.svg"],
-		"lovelyrabbit":       ["Lovely Rabbit",        "https://ac.blooket.com/marketassets/blooks/lovelyrabbit.svg"],
-		"hauntedpumpkin":     ["Haunted Pumpkin",      "https://ac.blooket.com/marketassets/blooks/hauntedpumpkin.svg"],
-		"pumpkincookie":      ["Pumpkin Cookie",       "https://ac.blooket.com/marketassets/blooks/pumpkincookie.svg"],
-		"ghostcookie":        ["Ghost Cookie",         "https://ac.blooket.com/marketassets/blooks/ghostcookie.svg"],
-		"redgummybear":       ["Red Gummy Bear",       "https://ac.blooket.com/marketassets/blooks/redgummybear.svg"],
-		"bluegummybear":      ["Blue Gummy Bear",      "https://ac.blooket.com/marketassets/blooks/bluegummybear.svg"],
-		"greengummybear":     ["Green Gummy Bear",     "https://ac.blooket.com/marketassets/blooks/greengummybear.svg"],
-		"chickchicken":       ["Chick Chicken",        "https://ac.blooket.com/marketassets/blooks/chickchicken.svg"],
-		"chickenchick":       ["Chicken Chick",        "https://ac.blooket.com/marketassets/blooks/chickenchick.svg"],
-		"raccoonbandit":      ["Raccoon Bandit",       "https://ac.blooket.com/marketassets/blooks/raccoonbandit.svg"],
-		"owlsheriff":         ["Owl Sheriff",          "https://ac.blooket.com/marketassets/blooks/owlsheriff.svg"],
-		"vampirefrog":        ["Vampire Frog",         "https://ac.blooket.com/marketassets/blooks/vampirefrog.svg"],
-		"pumpkinking":        ["Pumpkin King",         "https://ac.blooket.com/marketassets/blooks/pumpkinking.svg"],
-		"leprechaun":         ["Leprechaun",           "https://ac.blooket.com/marketassets/blooks/leprechaun.svg"],
-		"anacondawizard":     ["Anaconda Wizard",      "https://ac.blooket.com/marketassets/blooks/anacondawizard.svg"],
-		"spookypumpkin":      ["Spooky Pumpkin",       "https://ac.blooket.com/marketassets/blooks/spookypumpkin.svg"],
-		"spookymummy":        ["Spooky Mummy",         "https://ac.blooket.com/marketassets/blooks/spookymummy.svg"],
-		"agentowl":           ["Agent Owl",            "https://ac.blooket.com/marketassets/blooks/agentowl.svg"],
-		"masterelf":          ["Master Elf",           "https://ac.blooket.com/marketassets/blooks/masterelf.svg"],
-		"partypig":           ["Party Pig",            "https://ac.blooket.com/marketassets/blooks/partypig.svg"],
-		"wiseowl":            ["Wise Owl",             "https://ac.blooket.com/marketassets/blooks/wiseowl.svg"],
-		"wisecaterpillar":    ["Wise Caterpillar",     "https://ac.blooket.com/marketassets/blooks/wisecaterpillar.svg"],
-		"spookyghost":        ["Spooky Ghost",         "https://ac.blooket.com/marketassets/blooks/spookyghost.svg"],
-		"phantomking":        ["Phantom King",         "https://ac.blooket.com/marketassets/blooks/phantomking.svg"],
-		"timthealien":        ["Tim the Alien",        "https://ac.blooket.com/marketassets/blooks/timthealien.svg"],
-		"rainbowastronaut":   ["Rainbow Astronaut",    "https://ac.blooket.com/marketassets/blooks/rainbowastronaut.svg"],
-		"hamstaclaus":        ["Hamsta Claus",         "https://ac.blooket.com/marketassets/blooks/hamstaclaus.svg"],
-		"lightblue":          ["Light Blue",           "https://ac.blooket.com/marketassets/blooks/lightblue.svg"],
-		"black":              ["Black",                "https://ac.blooket.com/marketassets/blooks/black.svg"],
-		"red":                ["Red",                  "https://ac.blooket.com/marketassets/blooks/red.svg"],
-		"purple":             ["Purple",               "https://ac.blooket.com/marketassets/blooks/purple.svg"],
-		"pink":               ["Pink",                 "https://ac.blooket.com/marketassets/blooks/pink.svg"],
-		"orange":             ["Orange",               "https://ac.blooket.com/marketassets/blooks/orange.svg"],
-		"lime":               ["Lime",                 "https://ac.blooket.com/marketassets/blooks/lime.svg"],
-		"green":              ["Green",                "https://ac.blooket.com/marketassets/blooks/green.svg"],
-		"teal":               ["Teal",                 "https://ac.blooket.com/marketassets/blooks/teal.svg"],
-		"tan":                ["Tan",                  "https://ac.blooket.com/marketassets/blooks/tan.svg"],
-		"maroon":             ["Maroon",               "https://ac.blooket.com/marketassets/blooks/maroon.svg"],
-		"gray":               ["Gray",                 "https://ac.blooket.com/marketassets/blooks/gray.svg"],
-		"mint":               ["Mint",                 "https://ac.blooket.com/marketassets/blooks/mint.svg"],
-		"salmon":             ["Salmon",               "https://ac.blooket.com/marketassets/blooks/salmon.svg"],
-		"burgandy":           ["Burgandy",             "https://ac.blooket.com/marketassets/blooks/burgandy.svg"],
-		"babyblue":           ["Baby Blue",            "https://ac.blooket.com/marketassets/blooks/babyblue.svg"],
-		"dust":               ["Dust",                 "https://ac.blooket.com/marketassets/blooks/dust.svg"],
-		"brown":              ["Brown",                "https://ac.blooket.com/marketassets/blooks/brown.svg"],
-		"dull":               ["Dull Blue",            "https://ac.blooket.com/marketassets/blooks/dull.svg"],
-		"yellow":             ["Yellow",               "https://ac.blooket.com/marketassets/blooks/yellow.svg"],
-		"blue":               ["Blue",                 "https://ac.blooket.com/marketassets/blooks/blue.svg"]
+		"Chick":              ["Chick",                "https://ac.blooket.com/marketassets/blooks/chick.svg"],
+		"Chicken":            ["Chicken",              "https://ac.blooket.com/marketassets/blooks/chicken.svg"],
+		"Cow":                ["Cow",                  "https://ac.blooket.com/marketassets/blooks/cow.svg"],
+		"Goat":               ["Goat",                 "https://ac.blooket.com/marketassets/blooks/goat.svg"],
+		"Horse":              ["Horse",                "https://ac.blooket.com/marketassets/blooks/horse.svg"],
+		"Pig":                ["Pig",                  "https://ac.blooket.com/marketassets/blooks/pig.svg"],
+		"Sheep":              ["Sheep",                "https://ac.blooket.com/marketassets/blooks/sheep.svg"],
+		"Duck":               ["Duck",                 "https://ac.blooket.com/marketassets/blooks/duck.svg"],
+		"Alpaca":             ["Alpaca",               "https://ac.blooket.com/marketassets/blooks/alpaca.svg"],
+		"Dog":                ["Dog",                  "https://ac.blooket.com/marketassets/blooks/dog.svg"],
+		"Cat":                ["Cat",                  "https://ac.blooket.com/marketassets/blooks/cat.svg"],
+		"Rabbit":             ["Rabbit",               "https://ac.blooket.com/marketassets/blooks/rabbit.svg"],
+		"Goldfish":           ["Goldfish",             "https://ac.blooket.com/marketassets/blooks/goldfish.svg"],
+		"Hamster":            ["Hamster",              "https://ac.blooket.com/marketassets/blooks/hamster.svg"],
+		"Turtle":             ["Turtle",               "https://ac.blooket.com/marketassets/blooks/turtle.svg"],
+		"Kitten":             ["Kitten",               "https://ac.blooket.com/marketassets/blooks/kitten.svg"],
+		"Puppy":              ["Puppy",                "https://ac.blooket.com/marketassets/blooks/puppy.svg"],
+		"Bear":               ["Bear",                 "https://ac.blooket.com/marketassets/blooks/bear.svg"],
+		"Moose":              ["Moose",                "https://ac.blooket.com/marketassets/blooks/moose.svg"],
+		"Fox":                ["Fox",                  "https://ac.blooket.com/marketassets/blooks/fox.svg"],
+		"Raccoon":            ["Raccoon",              "https://ac.blooket.com/marketassets/blooks/raccoon.svg"],
+		"Squirrel":           ["Squirrel",             "https://ac.blooket.com/marketassets/blooks/squirrel.svg"],
+		"Owl":                ["Owl",                  "https://ac.blooket.com/marketassets/blooks/owl.svg"],
+		"Hedgehog":           ["Hedgehog",             "https://ac.blooket.com/marketassets/blooks/hedgehog.svg"],
+		"Deer":               ["Deer",                 "https://ac.blooket.com/marketassets/blooks/deer.svg"],
+		"Wolf":               ["Wolf",                 "https://ac.blooket.com/marketassets/blooks/wolf.svg"],
+		"Beaver":             ["Beaver",               "https://ac.blooket.com/marketassets/blooks/beaver.svg"],
+		"Tiger":              ["Tiger",                "https://ac.blooket.com/marketassets/blooks/tiger.svg"],
+		"Orangutan":          ["Orangutan",            "https://ac.blooket.com/marketassets/blooks/orangutan.svg"],
+		"Cockatoo":           ["Cockatoo",             "https://ac.blooket.com/marketassets/blooks/cockatoo.svg"],
+		"Parrot":             ["Parrot",               "https://ac.blooket.com/marketassets/blooks/parrot.svg"],
+		"Anaconda":           ["Anaconda",             "https://ac.blooket.com/marketassets/blooks/anaconda.svg"],
+		"Jaguar":             ["Jaguar",               "https://ac.blooket.com/marketassets/blooks/jaguar.svg"],
+		"Macaw":              ["Macaw",                "https://ac.blooket.com/marketassets/blooks/macaw.svg"],
+		"Toucan":             ["Toucan",               "https://ac.blooket.com/marketassets/blooks/toucan.svg"],
+		"Panther":            ["Panther",              "https://ac.blooket.com/marketassets/blooks/panther.svg"],
+		"Capuchin":           ["Capuchin",             "https://ac.blooket.com/marketassets/blooks/capuchinmonkey.svg"],
+		"Gorilla":            ["Gorilla",              "https://ac.blooket.com/marketassets/blooks/gorilla.svg"],
+		"Hippo":              ["Hippo",                "https://ac.blooket.com/marketassets/blooks/hippo.svg"],
+		"Rhino":              ["Rhino",                "https://ac.blooket.com/marketassets/blooks/rhino.svg"],
+		"Giraffe":            ["Giraffe",              "https://ac.blooket.com/marketassets/blooks/giraffe.svg"],
+		"Snowy Owl":          ["Snowy Owl",            "https://ac.blooket.com/marketassets/blooks/snowyowl.svg"],
+		"Polar Bear":         ["Polar Bear",           "https://ac.blooket.com/marketassets/blooks/polarbear.svg"],
+		"Arctic Fox":         ["Arctic Fox",           "https://ac.blooket.com/marketassets/blooks/arcticfox.svg"],
+		"Baby Penguin":       ["Baby Penguin",         "https://ac.blooket.com/marketassets/blooks/babypenguin.svg"],
+		"Penguin":            ["Penguin",              "https://ac.blooket.com/marketassets/blooks/penguin.svg"],
+		"Arctic Hare":        ["Arctic Hare",          "https://ac.blooket.com/marketassets/blooks/arctichare.svg"],
+		"Seal":               ["Seal",                 "https://ac.blooket.com/marketassets/blooks/seal.svg"],
+		"Walrus":             ["Walrus",               "https://ac.blooket.com/marketassets/blooks/walrus.svg"],
+		"Witch":              ["Witch",                "https://ac.blooket.com/marketassets/blooks/witch.svg"],
+		"Wizard":             ["Wizard",               "https://ac.blooket.com/marketassets/blooks/wizard.svg"],
+		"Elf":                ["Elf",                  "https://ac.blooket.com/marketassets/blooks/elf.svg"],
+		"Fairy":              ["Fairy",                "https://ac.blooket.com/marketassets/blooks/fairy.svg"],
+		"Slime Monster":      ["Slime Monster",        "https://ac.blooket.com/marketassets/blooks/slimemonster.svg"],
+		"Jester":             ["Jester",               "https://ac.blooket.com/marketassets/blooks/jester.svg"],
+		"Dragon":             ["Dragon",               "https://ac.blooket.com/marketassets/blooks/dragon.svg"],
+		"Queen":              ["Queen",                "https://ac.blooket.com/marketassets/blooks/queen.svg"],
+		"Unicorn":            ["Unicorn",              "https://ac.blooket.com/marketassets/blooks/unicorn.svg"],
+		"King":               ["King",                 "https://ac.blooket.com/marketassets/blooks/king.svg"],
+		"Two of Spades":      ["Two of Spades",        "https://ac.blooket.com/marketassets/blooks/twoofspades.svg"],
+		"Eat Me":             ["Eat Me",               "https://ac.blooket.com/marketassets/blooks/eat.svg"],
+		"Drink Me":           ["Drink Me",             "https://ac.blooket.com/marketassets/blooks/drink.svg"],
+		"Alice":              ["Alice",                "https://ac.blooket.com/marketassets/blooks/alice.svg"],
+		"Queen of Hearts":    ["Queen of Hearts",      "https://ac.blooket.com/marketassets/blooks/queenofhearts.svg"],
+		"Dormouse":           ["Dormouse",             "https://ac.blooket.com/marketassets/blooks/dormouse.svg"],
+		"White Rabbit":       ["White Rabbit",         "https://ac.blooket.com/marketassets/blooks/whiterabbit.svg"],
+		"Cheshire Cat":       ["Cheshire Cat",         "https://ac.blooket.com/marketassets/blooks/cheshirecat.svg"],
+		"Caterpillar":        ["Caterpillar",          "https://ac.blooket.com/marketassets/blooks/caterpillar.svg"],
+		"Mad Hatter":         ["Mad Hatter",           "https://ac.blooket.com/marketassets/blooks/madhatter.svg"],
+		"King of Hearts":     ["King of Hearts",       "https://ac.blooket.com/marketassets/blooks/kingofhearts.svg"],
+		"Toast":              ["Toast",                "https://ac.blooket.com/marketassets/blooks/toast.svg"],
+		"Cereal":             ["Cereal",               "https://ac.blooket.com/marketassets/blooks/cereal.svg"],
+		"Yogurt":             ["Yogurt",               "https://ac.blooket.com/marketassets/blooks/yogurt.svg"],
+		"Breakfast Combo":    ["Breakfast Combo",      "https://ac.blooket.com/marketassets/blooks/breakfastcombo.svg"],
+		"Orange Juice":       ["Orange Juice",         "https://ac.blooket.com/marketassets/blooks/orangejuice.svg"],
+		"Milk":               ["Milk",                 "https://ac.blooket.com/marketassets/blooks/milk.svg"],
+		"Waffle":             ["Waffle",               "https://ac.blooket.com/marketassets/blooks/waffle.svg"],
+		"Pancakes":           ["Pancakes",             "https://ac.blooket.com/marketassets/blooks/pancakes.svg"],
+		"French Toast":       ["French Toast",         "https://ac.blooket.com/marketassets/blooks/frenchtoast.svg"],
+		"Pizza":              ["Pizza",                "https://ac.blooket.com/marketassets/blooks/pizza.svg"],
+		"Earth":              ["Earth",                "https://ac.blooket.com/marketassets/blooks/earth.svg"],
+		"Meteor":             ["Meteor",               "https://ac.blooket.com/marketassets/blooks/meteor.svg"],
+		"Stars":              ["Stars",                "https://ac.blooket.com/marketassets/blooks/stars.svg"],
+		"Alien":              ["Alien",                "https://ac.blooket.com/marketassets/blooks/alien.svg"],
+		"Planet":             ["Planet",               "https://ac.blooket.com/marketassets/blooks/planet.svg"],
+		"UFO":                ["UFO",                  "https://ac.blooket.com/marketassets/blooks/ufo.svg"],
+		"Spaceship":          ["Spaceship",            "https://ac.blooket.com/marketassets/blooks/spaceship.svg"],
+		"Astronaut":          ["Astronaut",            "https://ac.blooket.com/marketassets/blooks/astronaut.svg"],
+		"Lil Bot":            ["Lil Bot",              "https://ac.blooket.com/marketassets/blooks/lilbot.svg"],
+		"Lovely Bot":         ["Lovely Bot",           "https://ac.blooket.com/marketassets/blooks/lovelybot.svg"],
+		"Angry Bot":          ["Angry Bot",            "https://ac.blooket.com/marketassets/blooks/angrybot.svg"],
+		"Happy Bot":          ["Happy Bot",            "https://ac.blooket.com/marketassets/blooks/happybot.svg"],
+		"Watson":             ["Watson",               "https://ac.blooket.com/marketassets/blooks/watson.svg"],
+		"Buddy Bot":          ["Buddy Bot",            "https://ac.blooket.com/marketassets/blooks/buddybot.svg"],
+		"Brainy Bot":         ["Brainy Bot",           "https://ac.blooket.com/marketassets/blooks/brainybot.svg"],
+		"Mega Bot":           ["Mega Bot",             "https://ac.blooket.com/marketassets/blooks/megabot.svg"],
+		"Old Boot":           ["Old Boot",             "https://ac.blooket.com/marketassets/blooks/oldboot.svg"],
+		"Jellyfish":          ["Jellyfish",            "https://ac.blooket.com/marketassets/blooks/jellyfish.svg"],
+		"Clownfish":          ["Clownfish",            "https://ac.blooket.com/marketassets/blooks/clownfish.svg"],
+		"Frog":               ["Frog",                 "https://ac.blooket.com/marketassets/blooks/frog.svg"],
+		"Crab":               ["Crab",                 "https://ac.blooket.com/marketassets/blooks/crab.svg"],
+		"Pufferfish":         ["Pufferfish",           "https://ac.blooket.com/marketassets/blooks/pufferfish.svg"],
+		"Blobfish":           ["Blobfish",             "https://ac.blooket.com/marketassets/blooks/blobfish.svg"],
+		"Octopus":            ["Octopus",              "https://ac.blooket.com/marketassets/blooks/octopus.svg"],
+		"Narwhal":            ["Narwhal",              "https://ac.blooket.com/marketassets/blooks/narwhal.svg"],
+		"Dolphin":            ["Dolphin",              "https://ac.blooket.com/marketassets/blooks/dolphin.svg"],
+		"Baby Shark":         ["Baby Shark",           "https://ac.blooket.com/marketassets/blooks/babyshark.svg"],
+		"Megalodon":          ["Megalodon",            "https://ac.blooket.com/marketassets/blooks/megalodon.svg"],
+		"Panda":              ["Panda",                "https://ac.blooket.com/marketassets/blooks/panda.svg"],
+		"Sloth":              ["Sloth",                "https://ac.blooket.com/marketassets/blooks/sloth.svg"],
+		"Tenrec":             ["Tenrec",               "https://ac.blooket.com/marketassets/blooks/tenrec.svg"],
+		"Flamingo":           ["Flamingo",             "https://ac.blooket.com/marketassets/blooks/flamingo.svg"],
+		"Zebra":              ["Zebra",                "https://ac.blooket.com/marketassets/blooks/zebra.svg"],
+		"Elephant":           ["Elephant",             "https://ac.blooket.com/marketassets/blooks/elephant.svg"],
+		"Lemur":              ["Lemur",                "https://ac.blooket.com/marketassets/blooks/lemur.svg"],
+		"Peacock":            ["Peacock",              "https://ac.blooket.com/marketassets/blooks/peacock.svg"],
+		"Chameleon":          ["Chameleon",            "https://ac.blooket.com/marketassets/blooks/chameleon.svg"],
+		"Lion":               ["Lion",                 "https://ac.blooket.com/marketassets/blooks/lion.svg"],
+		"Amber":              ["Amber",                "https://ac.blooket.com/marketassets/blooks/amber.svg"],
+		"Dino Egg":           ["Dino Egg",             "https://ac.blooket.com/marketassets/blooks/dinoegg.svg"],
+		"Dino Fossil":        ["Dino Fossil",          "https://ac.blooket.com/marketassets/blooks/dinofossil.svg"],
+		"Stegosaurus":        ["Stegosaurus",          "https://ac.blooket.com/marketassets/blooks/stegosaurus.svg"],
+		"Velociraptor":       ["Velociraptor",         "https://ac.blooket.com/marketassets/blooks/velociraptor.svg"],
+		"Brontosaurus":       ["Brontosaurus",         "https://ac.blooket.com/marketassets/blooks/brontosaurus.svg"],
+		"Triceratops":        ["Triceratops",          "https://ac.blooket.com/marketassets/blooks/triceratops.svg"],
+		"Tyrannosaurus Rex":  ["Tyrannosaurus Rex",    "https://ac.blooket.com/marketassets/blooks/tyrannosaurusrex.svg"],
+		"Ice Bat":            ["Ice Bat",              "https://ac.blooket.com/marketassets/blooks/icebat.svg"],
+		"Ice Bug":            ["Ice Bug",              "https://ac.blooket.com/marketassets/blooks/icebug.svg"],
+		"Ice Elemental":      ["Ice Elemental",        "https://ac.blooket.com/marketassets/blooks/iceelemental.svg"],
+		"Rock Monster":       ["Rock Monster",         "https://ac.blooket.com/marketassets/blooks/rockmonster.svg"],
+		"Dink":               ["Dink",                 "https://ac.blooket.com/marketassets/blooks/dink.svg"],
+		"Donk":               ["Donk",                 "https://ac.blooket.com/marketassets/blooks/donk.svg"],
+		"Bush Monster":       ["Bush Monster",         "https://ac.blooket.com/marketassets/blooks/bushmonster.svg"],
+		"Yeti":               ["Yeti",                 "https://ac.blooket.com/marketassets/blooks/yeti.svg"],
+		"Dingo":              ["Dingo",                "https://ac.blooket.com/marketassets/blooks/dingo.svg"],
+		"Echidna":            ["Echidna",              "https://ac.blooket.com/marketassets/blooks/echidna.svg"],
+		"Koala":              ["Koala",                "https://ac.blooket.com/marketassets/blooks/koala.svg"],
+		"Kookaburra":         ["Kookaburra",           "https://ac.blooket.com/marketassets/blooks/kookaburra.svg"],
+		"Platypus":           ["Platypus",             "https://ac.blooket.com/marketassets/blooks/platypus.svg"],
+		"Joey":               ["Joey",                 "https://ac.blooket.com/marketassets/blooks/joey.svg"],
+		"Kangaroo":           ["Kangaroo",             "https://ac.blooket.com/marketassets/blooks/kangaroo.svg"],
+		"Crocodile":          ["Crocodile",            "https://ac.blooket.com/marketassets/blooks/crocodile.svg"],
+		"Sugar Glider":       ["Sugar Glider",         "https://ac.blooket.com/marketassets/blooks/sugarglider.svg"],
+		"Deckhand":           ["Deckhand",             "https://ac.blooket.com/marketassets/blooks/deckhand.svg"],
+		"Buccaneer":          ["Buccaneer",            "https://ac.blooket.com/marketassets/blooks/buccaneer.svg"],
+		"Swashbuckler":       ["Swashbuckler",         "https://ac.blooket.com/marketassets/blooks/swashbuckler.svg"],
+		"Treasure Map":       ["Treasure Map",         "https://ac.blooket.com/marketassets/blooks/treasuremap.svg"],
+		"Seagull":            ["Seagull",              "https://ac.blooket.com/marketassets/blooks/seagull.svg"],
+		"Jolly Pirate":       ["Jolly Pirate",         "https://ac.blooket.com/marketassets/blooks/jollypirate.svg"],
+		"Pirate Ship":        ["Pirate Ship",          "https://ac.blooket.com/marketassets/blooks/pirateship.svg"],
+		"Kraken":             ["Kraken",               "https://ac.blooket.com/marketassets/blooks/kraken.svg"],
+		"Captain Blackbeard": ["Captain Blackbeard",   "https://ac.blooket.com/marketassets/blooks/captainblackbeard.svg"],
+		"Ant":                ["Ant",                  "https://ac.blooket.com/marketassets/blooks/ant.svg"],
+		"Rhino Beetle":       ["Rhino Beetle",         "https://ac.blooket.com/marketassets/blooks/rhinobeetle.svg"],
+		"Ladybug":            ["Ladybug",              "https://ac.blooket.com/marketassets/blooks/ladybug.svg"],
+		"Fly":                ["Fly",                  "https://ac.blooket.com/marketassets/blooks/fly.svg"],
+		"Worm":               ["Worm",                 "https://ac.blooket.com/marketassets/blooks/worm.svg"],
+		"Bee":                ["Bee",                  "https://ac.blooket.com/marketassets/blooks/bee.svg"],
+		"Mantis":             ["Mantis",               "https://ac.blooket.com/marketassets/blooks/mantis.svg"],
+		"Butterfly":          ["Butterfly",            "https://ac.blooket.com/marketassets/blooks/butterfly.svg"],
+		"Pumpkin":            ["Pumpkin",              "https://ac.blooket.com/marketassets/blooks/pumpkin.svg"],
+		"Swamp Monster":      ["Swamp Monster",        "https://ac.blooket.com/marketassets/blooks/swampmonster.svg"],
+		"Frankenstein":       ["Frankenstein",         "https://ac.blooket.com/marketassets/blooks/frankenstein.svg"],
+		"Vampire":            ["Vampire",              "https://ac.blooket.com/marketassets/blooks/vampire.svg"],
+		"Zombie":             ["Zombie",               "https://ac.blooket.com/marketassets/blooks/zombie.svg"],
+		"Mummy":              ["Mummy",                "https://ac.blooket.com/marketassets/blooks/mummy.svg"],
+		"Caramel Apple":      ["Caramel Apple",        "https://ac.blooket.com/marketassets/blooks/caramelapple2.svg"],
+		"Candy Corn":         ["Candy Corn",           "https://ac.blooket.com/marketassets/blooks/candycorn.svg"],
+		"Crow":               ["Crow",                 "https://ac.blooket.com/marketassets/blooks/crow.svg"],
+		"Werewolf":           ["Werewolf",             "https://ac.blooket.com/marketassets/blooks/werewolf.svg"],
+		"Ghost":              ["Ghost",                "https://ac.blooket.com/marketassets/blooks/ghost.svg"],
+		"Black Bear":         ["Black Bear",           "https://ac.blooket.com/marketassets/blooks/blackbear.svg"],
+		"Pumpkin Pie":        ["Pumpkin Pie",          "https://ac.blooket.com/marketassets/blooks/pumpkinpie.svg"],
+		"Chipmunk":           ["Chipmunk",             "https://ac.blooket.com/marketassets/blooks/chipmunk.svg"],
+		"Cornucopia":         ["Cornucopia",           "https://ac.blooket.com/marketassets/blooks/cornucopia.svg"],
+		"Autumn Cat":         ["Autumn Cat",           "https://ac.blooket.com/marketassets/blooks/autumncat.svg"],
+		"Pumpkin Puppy":      ["Pumpkin Puppy",        "https://ac.blooket.com/marketassets/blooks/pumpkinpuppy.svg"],
+		"Autumn Crow":        ["Autumn Crow",          "https://ac.blooket.com/marketassets/blooks/autumncrow.svg"],
+		"Turkey":             ["Turkey",               "https://ac.blooket.com/marketassets/blooks/turkey.svg"],
+		"Snow Globe":         ["Snow Globe",           "https://ac.blooket.com/marketassets/blooks/snowglobe.svg"],
+		"Holiday Gift":       ["Holiday Gift",         "https://ac.blooket.com/marketassets/blooks/holidaygift.svg"],
+		"Hot Chocolate":      ["Hot Chocolate",        "https://ac.blooket.com/marketassets/blooks/hotchocolate.svg"],
+		"Holiday Wreath":     ["Holiday Wreath",       "https://ac.blooket.com/marketassets/blooks/holidaywreath.svg"],
+		"Stocking":           ["Stocking",             "https://ac.blooket.com/marketassets/blooks/stocking.svg"],
+		"Gingerbread Man":    ["Gingerbread Man",      "https://ac.blooket.com/marketassets/blooks/gingerbreadman.svg"],
+		"Gingerbread House":  ["Gingerbread House",    "https://ac.blooket.com/marketassets/blooks/gingerbreadhouse.svg"],
+		"Reindeer":           ["Reindeer",             "https://ac.blooket.com/marketassets/blooks/reindeer.svg"],
+		"Snowman":            ["Snowman",              "https://ac.blooket.com/marketassets/blooks/snowman.svg"],
+		"Santa Claus":        ["Santa Claus",          "https://ac.blooket.com/marketassets/blooks/santaclaus.svg"],
+		"Rainbow Jellyfish":  ["Rainbow Jellyfish",    "https://ac.blooket.com/marketassets/blooks/rainbowjellyfish.svg"],
+		"Blizzard Clownfish": ["Blizzard Clownfish",   "https://ac.blooket.com/marketassets/blooks/blizzardclownfish.svg"],
+		"Lovely Frog":        ["Lovely Frog",          "https://ac.blooket.com/marketassets/blooks/lovelyfrog.svg"],
+		"Lucky Frog":         ["Lucky Frog",           "https://ac.blooket.com/marketassets/blooks/luckyfrog.svg"],
+		"Spring Frog":        ["Spring Frog",          "https://ac.blooket.com/marketassets/blooks/springfrog.svg"],
+		"Poison Dart Frog":   ["Poison Dart Frog",     "https://ac.blooket.com/marketassets/blooks/poisondartfrog.svg"],
+		"Lucky Hamster":      ["Lucky Hamster",        "https://ac.blooket.com/marketassets/blooks/luckyhamster.svg"],
+		"Lucky Bee":          ["Lucky Bee",            "https://ac.blooket.com/marketassets/blooks/luckybee.svg"],
+		"Chocolate Rabbit":   ["Chocolate Rabbit",     "https://ac.blooket.com/marketassets/blooks/chocolaterabbit.svg"],
+		"Spring Rabbit":      ["Spring Rabbit",        "https://ac.blooket.com/marketassets/blooks/springrabbit.svg"],
+		"Spring Deer":        ["Spring Deer",          "https://ac.blooket.com/marketassets/blooks/springdeer.svg"],
+		"Lemon Crab":         ["Lemon Crab",           "https://ac.blooket.com/marketassets/blooks/lemoncrab.svg"],
+		"Pirate Pufferfish":  ["Pirate Pufferfish",    "https://ac.blooket.com/marketassets/blooks/piratepufferfish.svg"],
+		"Donut Blobfish":     ["Donut Blobfish",       "https://ac.blooket.com/marketassets/blooks/donutblobfish.svg"],
+		"Crimson Octopus":    ["Crimson Octopus",      "https://ac.blooket.com/marketassets/blooks/crimsonoctopus.svg"],
+		"Rainbow Narwhal":    ["Rainbow Narwhal",      "https://ac.blooket.com/marketassets/blooks/rainbownarwhal.svg"],
+		"Frost Wreath":       ["Frost Wreath",         "https://ac.blooket.com/marketassets/blooks/frostwreath.svg"],
+		"Tropical Globe":     ["Tropical Globe",       "https://ac.blooket.com/marketassets/blooks/tropicalglobe.svg"],
+		"New York Snow Globe":  ["New York Snow Globe",  "https://ac.blooket.com/marketassets/blooks/newyorksnowglobe.svg"],
+		"London Snow Globe":    ["London Snow Globe",    "https://ac.blooket.com/marketassets/blooks/londonsnowglobe.svg"],
+		"Japan Snow Globe":     ["Japan Snow Globe",     "https://ac.blooket.com/marketassets/blooks/japansnowglobe.svg"],
+		"Egypt Snow Globe":     ["Egypt Snow Globe",     "https://ac.blooket.com/marketassets/blooks/egyptsnowglobe.svg"],
+		"Paris Snow Globe":     ["Paris Snow Globe",     "https://ac.blooket.com/marketassets/blooks/parissnowglobe.svg"],
+		"Red Sweater Snowman":  ["Red Sweater Snowman",  "https://ac.blooket.com/marketassets/blooks/redsweatersnowman.svg"],
+		"Blue Sweater Snowman": ["Blue Sweater Snowman", "https://ac.blooket.com/marketassets/blooks/bluesweatersnowman.svg"],
+		"Elf Sweater Snowman":  ["Elf Sweater Snowman",  "https://ac.blooket.com/marketassets/blooks/elfsweatersnowman.svg"],
+		"Holiday Elf":          ["Holiday Elf",          "https://ac.blooket.com/marketassets/blooks/holidayelf.svg"],
+		"Cozy Baby Penguin":    ["Cozy Baby Penguin",    "https://ac.blooket.com/marketassets/blooks/cozybabypenguin.svg"],
+		"Santa Claws":          ["Santa Claws",          "https://ac.blooket.com/marketassets/blooks/santaclaws.svg"],
+		"Cookies Combo":        ["Cookies Combo",        "https://ac.blooket.com/marketassets/blooks/cookiescombo.svg"],
+		"Chilly Flamingo":      ["Chilly Flamingo",      "https://ac.blooket.com/marketassets/blooks/chillyflamingo.svg"],
+		"Snowy Bush Monster":   ["Snowy Bush Monster",   "https://ac.blooket.com/marketassets/blooks/snowybushmonster.svg"],
+		"Nutcracker Koala":     ["Nutcracker Koala",     "https://ac.blooket.com/marketassets/blooks/nutcrackerkoala.svg"],
+		"Sandwich":             ["Sandwich",             "https://ac.blooket.com/marketassets/blooks/sandwich.svg"],
+		"Ice Slime":            ["Ice Slime",            "https://ac.blooket.com/marketassets/blooks/iceslime.svg"],
+		"Frozen Fossil":       ["Frozen Fossil",        "https://ac.blooket.com/marketassets/blooks/frozenfossil.svg"],
+		"Ice Crab":            ["Ice Crab",             "https://ac.blooket.com/marketassets/blooks/icecrab.svg"],
+		"Rainbow Panda":       ["Rainbow Panda",        "https://ac.blooket.com/marketassets/blooks/rainbowpanda.svg"],
+		"White Peacock":       ["White Peacock",        "https://ac.blooket.com/marketassets/blooks/whitepeacock.svg"],
+		"Tiger Zebra":         ["Tiger Zebra",          "https://ac.blooket.com/marketassets/blooks/tigerzebra.svg"],
+		"Teal Platypus":       ["Teal Platypus",        "https://ac.blooket.com/marketassets/blooks/tealplatypus.svg"],
+		"Golden Pumpkin Pie":  ["Golden Pumpkin Pie",   "https://ac.blooket.com/marketassets/blooks/goldenpumpkinpie.svg"],
+		"Blue Butterfly":      ["Blue Butterfly",       "https://ac.blooket.com/marketassets/blooks/bluebutterfly.svg"],
+		"Red Astronaut":       ["Red Astronaut",        "https://ac.blooket.com/marketassets/blooks/redastronaut.svg"],
+		"Orange Astronaut":    ["Orange Astronaut",     "https://ac.blooket.com/marketassets/blooks/orangeastronaut.svg"],
+		"Yellow Astronaut":    ["Yellow Astronaut",     "https://ac.blooket.com/marketassets/blooks/yellowastronaut.svg"],
+		"Lime Astronaut":      ["Lime Astronaut",       "https://ac.blooket.com/marketassets/blooks/limeastronaut.svg"],
+		"Green Astronaut":     ["Green Astronaut",      "https://ac.blooket.com/marketassets/blooks/greenastronaut.svg"],
+		"Cyan Astronaut":      ["Cyan Astronaut",       "https://ac.blooket.com/marketassets/blooks/cyanastronaut.svg"],
+		"Blue Astronaut":      ["Blue Astronaut",       "https://ac.blooket.com/marketassets/blooks/blueastronaut.svg"],
+		"Pink Astronaut":      ["Pink Astronaut",       "https://ac.blooket.com/marketassets/blooks/pinkastronaut.svg"],
+		"Purple Astronaut":    ["Purple Astronaut",     "https://ac.blooket.com/marketassets/blooks/purpleastronaut.svg"],
+		"Brown Astronaut":     ["Brown Astronaut",      "https://ac.blooket.com/marketassets/blooks/brownastronaut.svg"],
+		"Black Astronaut":     ["Black Astronaut",      "https://ac.blooket.com/marketassets/blooks/blackastronaut.svg"],
+		"Lovely Planet":       ["Lovely Planet",        "https://ac.blooket.com/marketassets/blooks/lovelyplanet.svg"],
+		"Lovely Peacock":      ["Lovely Peacock",       "https://ac.blooket.com/marketassets/blooks/lovelypeacock.svg"],
+		"Lovely Fox":          ["Lovely Fox",           "https://ac.blooket.com/marketassets/blooks/lovelyfox.svg"],
+		"Lovely Rabbit":       ["Lovely Rabbit",        "https://ac.blooket.com/marketassets/blooks/lovelyrabbit.svg"],
+		"Haunted Pumpkin":     ["Haunted Pumpkin",      "https://ac.blooket.com/marketassets/blooks/hauntedpumpkin.svg"],
+		"Pumpkin Cookie":      ["Pumpkin Cookie",       "https://ac.blooket.com/marketassets/blooks/pumpkincookie.svg"],
+		"Ghost Cookie":        ["Ghost Cookie",         "https://ac.blooket.com/marketassets/blooks/ghostcookie.svg"],
+		"Red Gummy Bear":      ["Red Gummy Bear",       "https://ac.blooket.com/marketassets/blooks/redgummybear.svg"],
+		"Blue Gummy Bear":     ["Blue Gummy Bear",      "https://ac.blooket.com/marketassets/blooks/bluegummybear.svg"],
+		"Green Gummy Bear":    ["Green Gummy Bear",     "https://ac.blooket.com/marketassets/blooks/greengummybear.svg"],
+		"Chick Chicken":       ["Chick Chicken",        "https://ac.blooket.com/marketassets/blooks/chickchicken.svg"],
+		"Chicken Chick":       ["Chicken Chick",        "https://ac.blooket.com/marketassets/blooks/chickenchick.svg"],
+		"Raccoon Bandit":      ["Raccoon Bandit",       "https://ac.blooket.com/marketassets/blooks/raccoonbandit.svg"],
+		"Owl Sheriff":         ["Owl Sheriff",          "https://ac.blooket.com/marketassets/blooks/owlsheriff.svg"],
+		"Vampire Frog":        ["Vampire Frog",         "https://ac.blooket.com/marketassets/blooks/vampirefrog.svg"],
+		"Pumpkin King":        ["Pumpkin King",         "https://ac.blooket.com/marketassets/blooks/pumpkinking.svg"],
+		"Leprechaun":          ["Leprechaun",           "https://ac.blooket.com/marketassets/blooks/leprechaun.svg"],
+		"Anaconda Wizard":     ["Anaconda Wizard",      "https://ac.blooket.com/marketassets/blooks/anacondawizard.svg"],
+		"Spooky Pumpkin":      ["Spooky Pumpkin",       "https://ac.blooket.com/marketassets/blooks/spookypumpkin.svg"],
+		"Spooky Mummy":        ["Spooky Mummy",         "https://ac.blooket.com/marketassets/blooks/spookymummy.svg"],
+		"Agent Owl":           ["Agent Owl",            "https://ac.blooket.com/marketassets/blooks/agentowl.svg"],
+		"Master Elf":          ["Master Elf",           "https://ac.blooket.com/marketassets/blooks/masterelf.svg"],
+		"Party Pig":           ["Party Pig",            "https://ac.blooket.com/marketassets/blooks/partypig.svg"],
+		"Wise Owl":            ["Wise Owl",             "https://ac.blooket.com/marketassets/blooks/wiseowl.svg"],
+		"Wise Caterpillar":    ["Wise Caterpillar",     "https://ac.blooket.com/marketassets/blooks/wisecaterpillar.svg"],
+		"Spooky Ghost":        ["Spooky Ghost",         "https://ac.blooket.com/marketassets/blooks/spookyghost.svg"],
+		"Phantom King":        ["Phantom King",         "https://ac.blooket.com/marketassets/blooks/phantomking.svg"],
+		"Tim the Alien":       ["Tim the Alien",        "https://ac.blooket.com/marketassets/blooks/timthealien.svg"],
+		"Rainbow Astronaut":   ["Rainbow Astronaut",    "https://ac.blooket.com/marketassets/blooks/rainbowastronaut.svg"],
+		"Hamsta Claus":        ["Hamsta Claus",         "https://ac.blooket.com/marketassets/blooks/hamstaclaus.svg"],
+		"Light Blue":          ["Light Blue",           "https://ac.blooket.com/marketassets/blooks/lightblue.svg"],
+		"Black":               ["Black",                "https://ac.blooket.com/marketassets/blooks/black.svg"],
+		"Red":                 ["Red",                  "https://ac.blooket.com/marketassets/blooks/red.svg"],
+		"Purple":              ["Purple",               "https://ac.blooket.com/marketassets/blooks/purple.svg"],
+		"Pink":                ["Pink",                 "https://ac.blooket.com/marketassets/blooks/pink.svg"],
+		"Orange":              ["Orange",               "https://ac.blooket.com/marketassets/blooks/orange.svg"],
+		"Lime":                ["Lime",                 "https://ac.blooket.com/marketassets/blooks/lime.svg"],
+		"Green":               ["Green",                "https://ac.blooket.com/marketassets/blooks/green.svg"],
+		"Teal":                ["Teal",                 "https://ac.blooket.com/marketassets/blooks/teal.svg"],
+		"Tan":                 ["Tan",                  "https://ac.blooket.com/marketassets/blooks/tan.svg"],
+		"Maroon":              ["Maroon",               "https://ac.blooket.com/marketassets/blooks/maroon.svg"],
+		"Gray":                ["Gray",                 "https://ac.blooket.com/marketassets/blooks/gray.svg"],
+		"Mint":                ["Mint",                 "https://ac.blooket.com/marketassets/blooks/mint.svg"],
+		"Salmon":              ["Salmon",               "https://ac.blooket.com/marketassets/blooks/salmon.svg"],
+		"Burgandy":            ["Burgandy",             "https://ac.blooket.com/marketassets/blooks/burgandy.svg"],
+		"Baby Blue":           ["Baby Blue",            "https://ac.blooket.com/marketassets/blooks/babyblue.svg"],
+		"Dust":                ["Dust",                 "https://ac.blooket.com/marketassets/blooks/dust.svg"],
+		"Brown":               ["Brown",                "https://ac.blooket.com/marketassets/blooks/brown.svg"],
+		"Dull Blue":           ["Dull Blue",            "https://ac.blooket.com/marketassets/blooks/dull.svg"],
+		"Yellow":              ["Yellow",               "https://ac.blooket.com/marketassets/blooks/yellow.svg"],
+		"Blue":                ["Blue",                 "https://ac.blooket.com/marketassets/blooks/blue.svg"]
 	},
 	banners: {
 		"starter":          "Default Banner",
@@ -889,7 +923,6 @@ const CHEATS = {
 			type: "toggleinput",
 			text: "Example Input Toggle",
 			state: 0,
-			input: "number",
 			run: function() {
 				console.log('Example Toggle Input', this.state, this.value);
 			}
@@ -934,7 +967,7 @@ const CHEATS = {
 			state: 0,
 			loop: null,
 			run: function() {
-                if (this.state === 0) {
+				if (this.state === 0) {
 					clearInterval(this.loop);
 					this.loop = null;
 				} else {
@@ -960,7 +993,7 @@ const CHEATS = {
 						}
 					}, 50);
 				}
-            }
+			}
 		}, {
 			type: "toggle",
 			text: "Highlight Answers",
@@ -978,12 +1011,12 @@ const CHEATS = {
 			text: "Force Custom Name",
 			state: 0,
 			run: function() {
-                Object.values(document.querySelector("body div[id] > div > div"))[1].children[0]._owner.stateNode.setState({
+				Object.values(document.querySelector("body div[id] > div > div"))[1].children[0]._owner.stateNode.setState({
 					isRandom: false,
-                    client: { name: "" }
-                });
-                document.querySelector('[class*="nameInput"]')?.focus?.();
-            }
+					client: { name: "" }
+				});
+				document.querySelector('[class*="nameInput"]')?.focus?.();
+			}
 		}, {
 			type: "select",
 			options: COSMETIC_OPTIONS.banners,
@@ -998,22 +1031,100 @@ const CHEATS = {
 	],
 	bot_flooder: [
 		{
-			type: "input",
+			type: "justinput",
 			text: "Name",
-			run: function() {}
+			run: function() {
+				this.value = this.value.replace(/[^A-Za-z0-9_\-\s]/g, '').slice(0, 11);
+				this.input.value = this.value;
+			}
 		}, {
 			type: "toggle",
 			text: "Random Names",
+			state: 0,
 			run: function() {}
+		}, {
+			type: "blookselect",
+			options: COSMETIC_OPTIONS.blooks,
+			run: function() {}
+		}, {
+			type: "select",
+			options: COSMETIC_OPTIONS.banners,
+			run: function() {}
+		}, {
+			type: "justinput",
+			text: "Amount",
+			run: function() {
+				this.value = this.value.replace(/[^0-9]/g, '').slice(0, 1);
+				this.input.value = this.value;
+			}
 		}, {
 			type: "button",
 			text: "Send",
 			run: async function() {
-				console.log('im async');
+				const blook = CHEATS.bot_flooder[2].value;
+				const banner = CHEATS.bot_flooder[3].value;
+				const amount = parseInt(CHEATS.bot_flooder[4].value) || 1;
+
+				const react = Object.values(document.querySelector("#app>div>div"))[1].children[0]._owner.stateNode;
+				console.log(react);
+				console.log(react.props.liveGameController);
+				if (!react.props.liveGameController._liveApp) {
+					fixAP();
+					alert("Can't find current game");
+					return;
+				}
+
+				for (var n = 0; n < amount; n++) {
+					const name = CHEATS.bot_flooder[1].state ? randomString(15) : ((CHEATS.bot_flooder[0].value || 'bot') + randomNumbers(4));
+					console.log('trying', name, blook, banner, amount);
+					await sendBot(react.props.liveGameController._liveApp.firebase, react.props.client.hostId, name, blook, banner);
+				}
 			}
+		}, {
+			type: "button",
+			text: "Warning: Bans possible if you spam",
+			wide: true,
+			run: function() {}
 		}
 	]
 };
+
+async function sendBot(firebase, game, name, blook, banner) {
+	console.log(game, name, blook, banner);
+	let joinReq = await fetch("https://fb.blooket.com/c/firebase/join", {
+		body: JSON.stringify({ id: game, name: name }),
+		credentials: "include",
+		method: "PUT"
+	}).then(e => e.json());
+	if (joinReq.success) {
+		let wsc = firebase.initializeApp({
+			apiKey: "AIzaSyCA-cTOnX19f6LFnDVVsHXya3k6ByP_MnU",
+			authDomain: "blooket-2020.firebaseapp.com",
+			projectId: "blooket-2020",
+			storageBucket: "blooket-2020.appspot.com",
+			messagingSenderId: "741533559105",
+			appId: "1:741533559105:web:b8cbb10e6123f2913519c0",
+			measurementId: "G-S3H5NGN10Z",
+			databaseURL: joinReq.fbShardURL
+		}, name);
+		await wsc.auth().signInWithCustomToken(joinReq.fbToken);
+		await wsc.database().ref(`${game}/c/${name}`).set({ b: blook, bg: banner });
+	} else {
+		alert("Connection error:", joinReq.msg);
+	}
+}
+
+async function injectConnection() {
+	try {
+		var react = Object.values(document.querySelector("#app>div>div"))[1].children[0]._owner.stateNode;
+		let liveApp = (await react.props.liveGameController.getDatabaseRef())?.database?.app;
+		if (!liveApp) return;
+		react.props.liveGameController._liveApp = liveApp;
+		return true;
+	} catch {
+		return;
+	}
+}
 
 function generateUI(section) {
 	if (!(section in CHEATS)) return null;
@@ -1059,6 +1170,7 @@ function generateUI(section) {
 				eleInput.type = 'text';
 				eleInput.placeholder = cheat.text;
 				ele.appendChild(eleInput);
+				cheat.input = eleInput;
 				eleButton = document.createElement('button');
 				eleButton.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M4 12.6111L8.92308 17.5L20 6.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>`;
 				eleButton.onclick = function() {
@@ -1066,6 +1178,20 @@ function generateUI(section) {
 					boundRun();
 				};
 				ele.appendChild(eleButton);
+				newUI.appendChild(ele);
+				break;
+			case 'justinput':
+				ele = document.createElement('div');
+				ele.classList.add('xmods-just-input');
+				eleInput = document.createElement('input');
+				eleInput.type = 'text';
+				eleInput.placeholder = cheat.text;
+				eleInput.onchange = function() {
+					cheat.value = eleInput.value;
+					boundRun();
+				};
+				ele.appendChild(eleInput);
+				cheat.input = eleInput;
 				newUI.appendChild(ele);
 				break;
 			case 'toggleinput':
@@ -1087,11 +1213,13 @@ function generateUI(section) {
 				ele.appendChild(eleButton);
 				newUI.appendChild(ele);
 				break;
+			case 'blookselect':
 			case 'select':
 				ele = document.createElement('div');
 				ele.classList.add('xmods-select');
 				eleButton = document.createElement('button');
 				eleButton.classList.add('xmods-choice');
+				if (cheat.type === 'blookselect') eleButton.classList.add('xmods-blook-choice');
 				cheat.value = Object.keys(cheat.options)[0];
 				let defaultText = document.createElement('p');
 				if (typeof cheat.options[cheat.value] === 'string') {
@@ -1106,17 +1234,19 @@ function generateUI(section) {
 				ele.appendChild(eleButton);
 				let eleOptions = document.createElement('div');
 				eleOptions.classList.add('xmods-options');
+				if (cheat.type === 'blookselect') eleOptions.classList.add('xmods-blook-options');
 				eleOptions.style.display = 'none';
 				let option;
 				for (let o in cheat.options) {
 					option = document.createElement('button');
 					option.classList.add('xmods-option');
+					if (cheat.type !== 'blookselect') {
+						option.innerHTML = typeof cheat.options[o] === 'string' ? cheat.options[o] : cheat.options[o][0];
+					}
 					if (typeof cheat.options[o] === 'string') {
 						option.classList.add('xmods-choice-no-img');
-						option.innerHTML = cheat.options[o];
 					} else {
 						option.style.backgroundImage = `url('${cheat.options[o][1]}')`;
-						option.innerHTML = cheat.options[o][0];
 					}
 					option.dataset.value = o;
 					option.onclick = function() {
@@ -1140,7 +1270,7 @@ function generateUI(section) {
 				}
 				ele.appendChild(eleOptions);
 				eleButton.onclick = function() {
-					eleOptions.style.display = 'block';
+					eleOptions.style.display = eleOptions.classList.contains('xmods-blook-options') ? 'grid' : 'block';
 					document.addEventListener('mousedown', function(e) {
 						if (!eleOptions.contains(e.target) && !eleButton.contains(e.target)) {
 							eleOptions.style.display = 'none';
@@ -1179,8 +1309,15 @@ function generateUI(section) {
 	});
 }
 generateUI('global');
+generateUI('bot_flooder');
 
 console.log("%c[XMODS] Loading always on...", "color: #00ff00; font-weight: bold; font-size: 10px;");
+
+let _connect = setInterval(async () => {
+	if (await injectConnection()) {
+		clearInterval(_connect);
+	}
+})
 
 let _allBlooks = setInterval(() => {
 	if (!document.querySelector('#app>div>div')) return;
@@ -1203,71 +1340,71 @@ console.log("%cFrom: %c xmods.vip ", "", "background: linear-gradient(to right, 
 
 })();
 
-const x = async function(e, amount, a, o) {
-    console.log(e, amount, a, o);
-	// name, amount, blook, banner
+// const x = async function(e, amount, a, o) {
+// 	console.log(e, amount, a, o);
+// 	// name, amount, blook, banner
 
-	const react = Object.values(document.querySelector("#app>div>div"))[1].children[0]._owner.stateNode;
-	var n = {
-		randomNames: !1
-	};
-	if (!react.props.liveGameController._liveApp) {
-		alert("Can't find current game");
-		return
-	}
-	var s = react.props.liveGameController._liveApp.firebase;
-	async function l(e, t) {
-		let r = await fetch("https://fb.blooket.com/c/firebase/join", {
-			body: JSON.stringify({
-				id: e,
-				name: t
-			}),
-			credentials: "include",
-			method: "PUT"
-		}).then(e => e.json());
-		if (r.success) {
-			let i = s.initializeApp({
-				apiKey: "AIzaSyCA-cTOnX19f6LFnDVVsHXya3k6ByP_MnU",
-				authDomain: "blooket-2020.firebaseapp.com",
-				projectId: "blooket-2020",
-				storageBucket: "blooket-2020.appspot.com",
-				messagingSenderId: "741533559105",
-				appId: "1:741533559105:web:b8cbb10e6123f2913519c0",
-				measurementId: "G-S3H5NGN10Z",
-				databaseURL: r.fbShardURL
-			}, t);
-			await i.auth().signInWithCustomToken(r.fbToken);
-			let n = i.database();
-			await n.ref(`${e}/c/${t}`).set({
-					b: a,
-					bg: o
-				}),
-				C.alerts[0].addLog(`Bot ${t} joined!`)
-		} else
-			alert("Connect error: " + r.msg)
-	}
-	async function c() {
-		const react = Object.values(document.querySelector("#app>div>div"))[1].children[0]._owner.stateNode;
-		if (!react.props.liveGameController._liveApp) {
-			alert("Can't find current game");
-			return
-		}
-		var a,
-			o = react.props.client.hostId,
-			amt = parseInt(amount);
-		if (!amt) {
-			alert("You must use a valid number!");
-			return
-		}
-		if (!n.randomNames)
-			var s = e;
-		for (var c = 0; c < amt; c++)
-			await l(o, a = n.randomNames ? d(15) : s + Math.floor(4e3 * Math.random()))
-	}
-	function d(e) {
-		for (var t = "", a = 0; a < e; a++)
-			t += String.fromCharCode(65 + Math.floor(25 * Math.random()));
-		return t
-	}
-	c();
-}
+// 	const react = Object.values(document.querySelector("#app>div>div"))[1].children[0]._owner.stateNode;
+// 	var n = {
+// 		randomNames: !1
+// 	};
+// 	if (!react.props.liveGameController._liveApp) {
+// 		alert("Can't find current game");
+// 		return
+// 	}
+// 	var s = react.props.liveGameController._liveApp.firebase;
+// 	async function l(e, t) {
+// 		let r = await fetch("https://fb.blooket.com/c/firebase/join", {
+// 			body: JSON.stringify({
+// 				id: e,
+// 				name: t
+// 			}),
+// 			credentials: "include",
+// 			method: "PUT"
+// 		}).then(e => e.json());
+// 		if (r.success) {
+// 			let i = s.initializeApp({
+// 				apiKey: "AIzaSyCA-cTOnX19f6LFnDVVsHXya3k6ByP_MnU",
+// 				authDomain: "blooket-2020.firebaseapp.com",
+// 				projectId: "blooket-2020",
+// 				storageBucket: "blooket-2020.appspot.com",
+// 				messagingSenderId: "741533559105",
+// 				appId: "1:741533559105:web:b8cbb10e6123f2913519c0",
+// 				measurementId: "G-S3H5NGN10Z",
+// 				databaseURL: r.fbShardURL
+// 			}, t);
+// 			await i.auth().signInWithCustomToken(r.fbToken);
+// 			let n = i.database();
+// 			await n.ref(`${e}/c/${t}`).set({
+// 					b: a,
+// 					bg: o
+// 				}),
+// 				C.alerts[0].addLog(`Bot ${t} joined!`)
+// 		} else
+// 			alert("Connect error: " + r.msg)
+// 	}
+// 	async function c() {
+// 		const react = Object.values(document.querySelector("#app>div>div"))[1].children[0]._owner.stateNode;
+// 		if (!react.props.liveGameController._liveApp) {
+// 			alert("Can't find current game");
+// 			return
+// 		}
+// 		var a,
+// 			o = react.props.client.hostId,
+// 			amt = parseInt(amount);
+// 		if (!amt) {
+// 			alert("You must use a valid number!");
+// 			return
+// 		}
+// 		if (!n.randomNames)
+// 			var s = e;
+// 		for (var c = 0; c < amt; c++)
+// 			await l(o, a = n.randomNames ? d(15) : s + Math.floor(4e3 * Math.random()))
+// 	}
+// 	function d(e) {
+// 		for (var t = "", a = 0; a < e; a++)
+// 			t += String.fromCharCode(65 + Math.floor(25 * Math.random()));
+// 		return t
+// 	}
+// 	c();
+// }
