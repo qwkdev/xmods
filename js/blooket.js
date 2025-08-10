@@ -1,6 +1,6 @@
 (() => {
 
-const VERSION = "09.08.25";
+const VERSION = "10.08.25";
 
 if (document.getElementById("xmods-gui")) {
 	document.getElementById('xmods-gui').remove();
@@ -81,6 +81,7 @@ css.textContent = `
 }
 #xmods-gui, #xmods-gui * {
 	font-family: inherit;
+	box-sizing: border-box;
 }
 .xmods-gui-drag {
 	position: absolute;
@@ -199,7 +200,6 @@ css.textContent = `
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: calc(var(--gui-width) * 0.02);
-	box-sizing: border-box;
 }
 #xmods-gui-main section button, #xmods-gui-main section input[type="text"], #xmods-gui-main section input[type="number"] {
 	width: 100%;
@@ -237,7 +237,6 @@ css.textContent = `
 }
 #xmods-gui-main section .xmods-just-input input {
 	padding-left: calc(var(--gui-width) * 0.02);
-	box-sizing: border-box;
 }
 #xmods-gui-main section .xmods-input input {
 	padding-left: calc(var(--gui-width) * 0.02);
@@ -439,7 +438,7 @@ gui.id = "xmods-gui";
 gui.innerHTML = `
 	<div id="xmods-gui-drag-top" class="xmods-gui-drag">
 		<button id="xmods-gui-hide"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M6 12L18 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg></button>
-		<h1>Example Words<span>v${VERSION}</span></h1>
+		<h1>Blooket Hacks<span>v${VERSION}</span></h1>
 		<button id="xmods-gui-close"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M6 6L18 18M18 6L6 18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg></button>
 	</div>
 	<div id="xmods-gui-main">
@@ -802,7 +801,7 @@ const COSMETIC_OPTIONS = {
 		"Blue":                ["Blue",                 "https://ac.blooket.com/marketassets/blooks/blue.svg"]
 	},
 	banners: {
-		"starter":          "Default Banner",
+		"":                  "Default Banner",
 		"alphabetSoup":     ["Alphabet Soup",      "https://media.blooket.com/image/upload/v1674539714/Banners/alphabetSoup.svg"],
 		"artClass":         ["Art Class",          "https://media.blooket.com/image/upload/v1674539714/Banners/artClass.svg"],
 		"baguette":         ["Baguette",           "https://media.blooket.com/image/upload/v1674539714/Banners/baguette.svg"],
@@ -878,6 +877,7 @@ const COSMETIC_OPTIONS = {
 		"spooky":           ["Spooky",             "https://media.blooket.com/image/upload/v1674539714/Banners/spooky.svg"],
 		"spookyCat":        ["Spooky Cat",         "https://media.blooket.com/image/upload/v1674539714/Banners/spookyCat.svg"],
 		"spookyWindow":     ["Spooky Window",      "https://media.blooket.com/image/upload/v1674539714/Banners/spookyWindow.svg"],
+		"starter":          ["Starter",            "https://media.blooket.com/image/upload/v1674539714/Banners/starter.svg"],
 		"sunset":           ["Sunset",             "https://media.blooket.com/image/upload/v1674539714/Banners/sunset.svg"],
 		"surfboard":        ["Surfboard",          "https://media.blooket.com/image/upload/v1674539714/Banners/surfboard.svg"],
 		"sushi":            ["Sushi",              "https://media.blooket.com/image/upload/v1674539714/Banners/sushi.svg"],
@@ -895,6 +895,7 @@ const COSMETIC_OPTIONS = {
 	}
 }
 
+//! TODO: Bot flood amount input cuts off 10 into 1, parseInt then clamp else clamp string
 const CHEATS = {
 	example: [
 		{
@@ -953,13 +954,23 @@ const CHEATS = {
 	global: [
 		{
 			type: "slider",
-			wide: true,
+			// wide: true,
 			text: "GUI Size",
-			min: 20,
+			min: 30,
 			max: 60,
 			value: 50,
 			run: function() {
 				gui.style.setProperty('--gui-width', `${this.value}vw`);
+			}
+		}, {
+			type: "select",
+			options: COSMETIC_OPTIONS.banners,
+			run: function() {
+				const react = Object.values(document.querySelector("#app>div>div"))[1].children[0]._owner;
+				react.stateNode.props.liveGameController.setVal({
+					path: "c/" + react.stateNode.props.client.name + "/bg",
+					val: this.value
+				})
 			}
 		}, {
 			type: "toggle",
@@ -983,11 +994,7 @@ const CHEATS = {
 							if ((stage === "feedback") || feedback) {
 								correct = document.querySelector('[class*="feedback"]')?.firstChild;
 							} else {
-								correct = [
-									...document.querySelectorAll('[class*="answerContainer"]')
-								][
-									question.answers.findIndex(answer => question.correctAnswers.includes(answer))
-								];
+								correct = document.querySelectorAll('[class*="answerContainer"]')[question.answers.findIndex(answer => question.correctAnswers.includes(answer))];
 							}
 							correct?.click?.();
 						}
@@ -998,13 +1005,53 @@ const CHEATS = {
 			type: "toggle",
 			text: "Highlight Answers",
 			state: 0,
+			loop: null,
 			run: function() {
+				if (this.state === 0) {
+					clearInterval(this.loop);
+					this.loop = null;
+				} else {
+					this.loop = setInterval(() => {
+						let findReact = document.querySelector("body>div");
+						while (!Object.values(findReact)[1]?.children?.[0]?._owner?.stateNode) {
+							findReact = findReact.querySelector(":scope>div");
+							if (!findReact) break;
+						}
+
+						let { state, props } = Object.values(findReact)[1].children[0]._owner.stateNode;
+						const question = state.question || props.client.question;
+
+						document.querySelectorAll('[class*="answerContainer"]').forEach((answer, index) => {
+							answer.style.backgroundColor = question.correctAnswers.includes(question.answers[index]) ? "#0c7" : "#b12";
+						});
+					}, 50);
+				}
 			}
 		}, {
 			type: "toggle",
 			text: "Freeze Leaderboard",
 			state: 0,
+			loop: null,
 			run: function() {
+				let findReact = document.querySelector("#app");
+				while (!Object.values(findReact)[1]?.children?.[0]?._owner?.stateNode) {
+					findReact = findReact.querySelector(":scope>div");
+					if (!findReact) break;
+				}
+				let react = Object.values(findReact)[1].children[0]._owner.stateNode;
+				
+				if (this.state === 0) {
+					clearInterval(this.loop);
+					this.loop = null;
+					react.props.liveGameController.removeVal(`c/${react.props.client.name}/tat`);
+				} else {
+					this.loop = setInterval(() => {
+						react.props.liveGameController.setVal({
+							path: `c/${react.props.client.name}/tat/Freeze`,
+							val: "freeze"
+						});
+					}, 25);
+				}
 			}
 		}, {
 			type: "button",
@@ -1016,16 +1063,6 @@ const CHEATS = {
 					client: { name: "" }
 				});
 				document.querySelector('[class*="nameInput"]')?.focus?.();
-			}
-		}, {
-			type: "select",
-			options: COSMETIC_OPTIONS.banners,
-			run: function() {
-				const react = Object.values(document.querySelector("#app>div>div"))[1].children[0]._owner;
-				react.stateNode.props.liveGameController.setVal({
-					path: "c/" + react.stateNode.props.client.name + "/bg",
-					val: this.value
-				})
 			}
 		}
 	],
@@ -1066,8 +1103,6 @@ const CHEATS = {
 				const amount = parseInt(CHEATS.bot_flooder[4].value) || 1;
 
 				const react = Object.values(document.querySelector("#app>div>div"))[1].children[0]._owner.stateNode;
-				console.log(react);
-				console.log(react.props.liveGameController);
 				if (!react.props.liveGameController._liveApp) {
 					fixAP();
 					alert("Can't find current game");
@@ -1086,7 +1121,186 @@ const CHEATS = {
 			wide: true,
 			run: function() {}
 		}
-	]
+	],
+	gold_quest: [
+		{
+			type: "toggle",
+			text: "Auto Open",
+			state: 0,
+			loop: null,
+			run: function() {
+				if (this.state === 0) {
+					clearInterval(this.loop);
+					this.loop = null;
+				} else {
+					this.loop = setInterval(() => {
+						let findReact = document.querySelector("body>div");
+						while (!Object.values(findReact)[1]?.children?.[0]?._owner?.stateNode) {
+							findReact = findReact.querySelector(":scope>div");
+							if (!findReact) break;
+						}
+						const react = Object.values(findReact)[1].children[0]._owner.stateNode;
+						if (react.state.stage == 'prize') {
+							react.props.liveGameController.getDatabaseVal('c', players => {
+								if (players == null) return;
+								const playerList = Object.entries(players);
+								let richest = 0, currentBest = 0, chestIndex = -1;
+								for (let i = 0; i < playerList.length; i++) {
+									if (playerList[i][0] != react.props.client.name && playerList[i][1] > richest) {
+										richest = playerList[i][1];
+									}
+								}
+								for (let i = 0; i < react.state.choices.length; i++) {
+									const choice = react.state.choices[i];
+									let value = react.state.gold;
+									if (choice.type == "gold") {
+										value = react.state.gold + (choice.val || 0);
+									} else if (choice.type == "multiply" || choice.type == "divide") {
+										value = Math.round(react.state.gold * choice.val) || react.state.gold;
+									} else if (choice.type == "swap") {
+										value = richest || react.state.gold;
+									} else if (choice.type == "take") {
+										value = react.state.gold + (richest * choice.val || 0);
+									}
+									if ((value || 0) <= currentBest)
+										continue;
+									currentBest = value;
+									chestIndex = i + 1;
+								}
+								document.querySelector("div[class*='choice" + chestIndex + "']")?.click();
+							})
+						}
+					}, 50);
+				}
+			}
+		}, {
+			type: "toggle",
+			text: "Chest ESP",
+			state: 0,
+			loop: null,
+			run: function() {
+				if (this.state === 0) {
+					clearInterval(this.loop);
+					this.loop = null;
+				} else {
+					this.loop = setInterval(() => {
+						let findReact = document.querySelector("body>div");
+						while (!Object.values(findReact)[1]?.children?.[0]?._owner?.stateNode) {
+							findReact = findReact.querySelector(":scope>div");
+							if (!findReact) break;
+						}
+						let react = Object.values(findReact)[1].children[0]._owner.stateNode;
+						react.state.choices.forEach(({ text }, index) => {
+							let chest = document.querySelector(`div[class*='choice${index + 1}']`);
+							if (!chest || chest.querySelector('div'))
+								return;
+							let choice = document.createElement('div')
+							choice.style.color = "white";
+							choice.style.fontFamily = "Eczar";
+							choice.style.fontSize = "2em";
+							choice.style.display = "flex";
+							choice.style.justifyContent = "center";
+							choice.style.transform = "translateY(200px)";
+							choice.innerText = text;
+							chest.append(choice)
+						});
+					}, 50);
+				}
+			}
+		}, {
+			type: "toggle",
+			text: "Always Quintuple",
+			state: 0,
+			loop: null,
+			run: function() {
+				if (this.state === 0) {
+					clearInterval(this.loop);
+					this.loop = null;
+				} else {
+					this.loop = setInterval(() => {
+						
+					}, 50);
+				}
+			}
+		}, {
+			type: "toggle",
+			text: "No Lose 25%/50%",
+			state: 0,
+			loop: null,
+			run: function() {
+				if (this.state === 0) {
+					clearInterval(this.loop);
+					this.loop = null;
+				} else {
+					this.loop = setInterval(() => {
+						
+					}, 50);
+				}
+			}
+		}, {
+			type: "input",
+			text: "Set Gold",
+			reset: true,
+			run: function() {
+
+			}
+		}, {
+			type: "button",
+			text: "Max Gold",
+			run: function() {
+
+			}
+		}, {
+			type: "input",
+			text: "Flood Host Text",
+			reset: true,
+			run: function() {
+
+			}
+		}, {
+			type: "button",
+			text: "Crash Host",
+			run: function() {
+
+			}
+		}, {
+			type: "select",
+			text: "Select Player",
+			wide: true,
+			run: function() {
+
+			}
+		}, {
+			type: "input",
+			text: "Set Their Gold",
+			reset: true,
+			run: function() {
+
+			}
+		}, {
+			type: "input",
+			text: "Send Text",
+			reset: true,
+			run: function() {
+
+			}
+		}
+	],
+	fishing_frenzy: [],
+	crypto: [],
+	laser_tag: [],
+	coco_cabana: [],
+	pirates_voyage: [],
+	tower_defense_2: [],
+	monster_brawl: [],
+	deceptive_dinos: [],
+	battle_royale: [],
+	tower_defense: [],
+	cafe: [],
+	factory: [],
+	racing: [],
+	blook_rush: [],
+	classic: []
 };
 
 async function sendBot(firebase, game, name, blook, banner) {
@@ -1176,6 +1390,7 @@ function generateUI(section) {
 				eleButton.onclick = function() {
 					cheat.value = eleInput.value;
 					boundRun();
+					if (cheat.reset) eleInput.value = '';
 				};
 				ele.appendChild(eleButton);
 				newUI.appendChild(ele);
@@ -1310,6 +1525,8 @@ function generateUI(section) {
 }
 generateUI('global');
 generateUI('bot_flooder');
+// generateUI('gold_quest');
+//! TODO
 
 console.log("%c[XMODS] Loading always on...", "color: #00ff00; font-weight: bold; font-size: 10px;");
 
@@ -1339,72 +1556,3 @@ console.log("%c Blooket Hacks ", "background: linear-gradient(to right, #f00, #0
 console.log("%cFrom: %c xmods.vip ", "", "background: linear-gradient(to right, #70f, #0af); color: #ffffff; border-radius: 20px; font-weight: bold; font-size: 20px;");
 
 })();
-
-// const x = async function(e, amount, a, o) {
-// 	console.log(e, amount, a, o);
-// 	// name, amount, blook, banner
-
-// 	const react = Object.values(document.querySelector("#app>div>div"))[1].children[0]._owner.stateNode;
-// 	var n = {
-// 		randomNames: !1
-// 	};
-// 	if (!react.props.liveGameController._liveApp) {
-// 		alert("Can't find current game");
-// 		return
-// 	}
-// 	var s = react.props.liveGameController._liveApp.firebase;
-// 	async function l(e, t) {
-// 		let r = await fetch("https://fb.blooket.com/c/firebase/join", {
-// 			body: JSON.stringify({
-// 				id: e,
-// 				name: t
-// 			}),
-// 			credentials: "include",
-// 			method: "PUT"
-// 		}).then(e => e.json());
-// 		if (r.success) {
-// 			let i = s.initializeApp({
-// 				apiKey: "AIzaSyCA-cTOnX19f6LFnDVVsHXya3k6ByP_MnU",
-// 				authDomain: "blooket-2020.firebaseapp.com",
-// 				projectId: "blooket-2020",
-// 				storageBucket: "blooket-2020.appspot.com",
-// 				messagingSenderId: "741533559105",
-// 				appId: "1:741533559105:web:b8cbb10e6123f2913519c0",
-// 				measurementId: "G-S3H5NGN10Z",
-// 				databaseURL: r.fbShardURL
-// 			}, t);
-// 			await i.auth().signInWithCustomToken(r.fbToken);
-// 			let n = i.database();
-// 			await n.ref(`${e}/c/${t}`).set({
-// 					b: a,
-// 					bg: o
-// 				}),
-// 				C.alerts[0].addLog(`Bot ${t} joined!`)
-// 		} else
-// 			alert("Connect error: " + r.msg)
-// 	}
-// 	async function c() {
-// 		const react = Object.values(document.querySelector("#app>div>div"))[1].children[0]._owner.stateNode;
-// 		if (!react.props.liveGameController._liveApp) {
-// 			alert("Can't find current game");
-// 			return
-// 		}
-// 		var a,
-// 			o = react.props.client.hostId,
-// 			amt = parseInt(amount);
-// 		if (!amt) {
-// 			alert("You must use a valid number!");
-// 			return
-// 		}
-// 		if (!n.randomNames)
-// 			var s = e;
-// 		for (var c = 0; c < amt; c++)
-// 			await l(o, a = n.randomNames ? d(15) : s + Math.floor(4e3 * Math.random()))
-// 	}
-// 	function d(e) {
-// 		for (var t = "", a = 0; a < e; a++)
-// 			t += String.fromCharCode(65 + Math.floor(25 * Math.random()));
-// 		return t
-// 	}
-// 	c();
-// }
