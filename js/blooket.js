@@ -1288,8 +1288,6 @@ const CHEATS = {
 	],
 	fishing_frenzy: [],
 	crypto: [],
-	laser_tag: [],
-	coco_cabana: [],
 	pirates_voyage: [],
 	tower_defense_2: [],
 	monster_brawl: [],
@@ -1352,7 +1350,11 @@ function generateUI(section) {
 
 	const newUI = document.createElement('section');
 	newUI.id = `xmods-gui-${section.replace('_', '-')}`;
-	mainUI.appendChild(newUI);
+	if (mainUI.children.length >= 2) {
+		mainUI.insertBefore(newUI, mainUI.children[1]);
+	} else {
+		mainUI.appendChild(newUI);
+	}
 
 	CHEATS[section].forEach(cheat => {
 		let ele;
@@ -1524,9 +1526,53 @@ function generateUI(section) {
 	});
 }
 generateUI('global');
-generateUI('bot_flooder');
-// generateUI('gold_quest');
-//! TODO
+if (!window.location.hostname.startsWith('solo.')) {
+	generateUI('bot_flooder');
+}
+
+function getGamemode() {
+	switch (window.location.pathname) {
+		case "/play/gold":
+			return "gold_quest";
+		case "/play/fishing":
+			return "fishing_frenzy";
+		case "/play/hack":
+			return "crypto";
+		case "/play/pirate":
+			return "pirates_voyage";
+		case "/play/defense2":
+			return "tower_defense_2";
+		case "/play/brawl":
+			return "monster_brawl";
+		case "/play/dino":
+			return "deceptive_dinos";
+		case "/play/battle-royale/match/preview":
+		case "/play/battle-royale/question":
+		case "/play/battle-royale/answer/sent":
+		case "/play/battle-royale/answer/result":
+		case "/play/battle-royale/match/result":
+			return "battle_royale";
+		case "/defense":
+			return "tower_defense";
+		case "/cafe":
+		case "/cafe/shop":
+			return "cafe";
+		case "/play/factory":
+			return "factory";
+		case "/play/racing":
+			return "racing";
+		case "/play/rush":
+			return "rush";
+		case "/play/classic/get-ready":
+		case "/play/classic/question":
+		case "/play/classic/answer/sent":
+		case "/play/classic/answer/result":
+		case "/play/classic/standings":
+			return "classic";
+		default:
+			return false
+	}
+}
 
 console.log("%c[XMODS] Loading always on...", "color: #00ff00; font-weight: bold; font-size: 10px;");
 
@@ -1534,7 +1580,14 @@ let _connect = setInterval(async () => {
 	if (await injectConnection()) {
 		clearInterval(_connect);
 	}
-})
+}, 100);
+let _makeUI = setInterval(() => {
+	const gamemode = getGamemode();
+	if (gamemode) {
+		generateUI(gamemode);
+		clearInterval(_makeUI);
+	}
+}, 500);
 
 let _allBlooks = setInterval(() => {
 	if (!document.querySelector('#app>div>div')) return;
