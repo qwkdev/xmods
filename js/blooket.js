@@ -1,6 +1,6 @@
 (() => {
 
-const VERSION = "10.08.25";
+const VERSION = "12.08.25";
 
 if (document.getElementById("xmods-gui")) {
 	document.getElementById('xmods-gui').remove();
@@ -501,6 +501,9 @@ function randomNumbers(len) {
 		result += characters.charAt(Math.floor(Math.random() * characters.length));
 	}
 	return result;
+}
+function repeatText(text, times) {
+	return new Array(times).fill(text).join(' ');
 }
 
 const COSMETIC_OPTIONS = {
@@ -1213,12 +1216,23 @@ const CHEATS = {
 			state: 0,
 			loop: null,
 			run: function() {
+				let react = Object.values(document.querySelector("body div[id] > div > div"))[1].children[0]._owner.stateNode;
+				react._choosePrize ||= react.choosePrize;
 				if (this.state === 0) {
 					clearInterval(this.loop);
 					this.loop = null;
+					react.choosePrize = react._choosePrize || react.choosePrize;
 				} else {
 					this.loop = setInterval(() => {
-						
+						react.choosePrize = function(chest) {
+							react.state.choices[chest] = {
+								type: "multiply",
+								val: 5,
+								text: "Quintuple Gold!",
+								blook: "Ice Elemental"
+							},
+							react._choosePrize(chest);
+						};
 					}, 50);
 				}
 			}
@@ -1226,14 +1240,52 @@ const CHEATS = {
 			type: "toggle",
 			text: "No Lose 25%/50%",
 			state: 0,
-			loop: null,
+			loop1: null,
+			loop2: null,
 			run: function() {
 				if (this.state === 0) {
-					clearInterval(this.loop);
-					this.loop = null;
+					clearInterval(this.loop1);
+					clearInterval(this.loop2);
+					this.loop1 = null;
+					this.loop2 = null;
 				} else {
-					this.loop = setInterval(() => {
-						
+					this.loop1 = setInterval(() => {
+						document.querySelectorAll('div[role="button"]').forEach(e => {
+							if (e.innerText === "Lose 25%" || e.innerText == "Lose 50%") {
+								e.style.display = "none";
+							}
+						});
+					}, 50);
+					this.loop2 = setInterval(() => {
+						try {
+							const react = Object.values(document.querySelector("#app > div > div"))[1].children[1]._owner;
+							if (react.stateNode.state.stage === "prize") {
+								let { choices } = react.stateNode.state;
+								chests = document.querySelector("div[class*='regularBody']").children[1];
+
+								if (chests && (document.querySelectorAll(".chest-esp").length)) {
+									choices.forEach((chest, index) => {
+										if (chests.children.length == 3 && chests.children[index].children[1].innerText != chest.text) {
+											chests.children[index].children[1].innerText = chest.text;
+										}
+									});
+								} else {
+									choices.forEach((chest, index) => {
+										chestESP = document.createElement("p");
+										chestESP.className = "chest-esp";
+										chestESP.innerText = chest.text;
+										chestESP.style = "text-align: center; font-size: 30px; color: white; font-family: Titan One, sans-serif; border-color: black; margin-top: 200px; opacity: 0;";
+										try {
+											chests.children[index].appendChild(chestESP);
+										} catch (e) {
+											console.log(e);
+										}
+									});
+								}
+							}
+						} catch (i) {
+							console.log(i);
+						}
 					}, 50);
 				}
 			}
@@ -1242,38 +1294,94 @@ const CHEATS = {
 			text: "Set Gold",
 			reset: true,
 			run: function() {
-
+				const amount = parseInt(this.value);
+				this.input.value = amount;
+				if (amount) {
+					var react = Object.values(document.querySelector("body div[id] > div > div"))[1].children[0]._owner.stateNode;
+					react.setState({
+						gold: amount,
+						gold2: amount
+					});
+					react.props.liveGameController.setVal({
+						path: "c/".concat(react.props.client.name),
+						val: {
+							b: react.props.client.blook,
+							g: amount
+						}
+					});
+				}
 			}
 		}, {
 			type: "button",
 			text: "Max Gold",
 			run: function() {
-
+				const amount = Number.MAX_VALUE;
+				var react = Object.values(document.querySelector("body div[id] > div > div"))[1].children[0]._owner.stateNode;
+				react.setState({
+					gold: amount,
+					gold2: amount
+				});
+				react.props.liveGameController.setVal({
+					path: "c/".concat(react.props.client.name),
+					val: {
+						b: react.props.client.blook,
+						g: amount
+					}
+				});
 			}
 		}, {
 			type: "input",
 			text: "Flood Host Text",
 			reset: true,
 			run: function() {
-
+				const react = Object.values(document.querySelector('#app>div>div'))[1].children[0]._owner;
+				react.stateNode.props.liveGameController.getDatabaseVal("c/").then(data => {
+					if ((data != null) && this.value) {
+						react.stateNode.props.liveGameController.setVal({
+							path: "c/" + react.stateNode.props.client.name + "/tat",
+							val: `${Object.keys(data)[0]}:1,723,583,989,363${repeatText(this.value, 1700)}`
+						});
+					}
+				});
 			}
 		}, {
 			type: "button",
 			text: "Crash Host",
 			run: function() {
-
+				const react = Object.values(document.querySelector('#app>div>div'))[1].children[0]._owner;
+				react.stateNode.props.liveGameController.setVal({
+					path: "c/" + react.stateNode.props.client.name + "/g/t",
+					val: "y"
+				});
 			}
 		}, {
 			type: "select",
-			text: "Select Player",
 			wide: true,
+			options: {
+				'': 'Loading Players...',
+			},
 			run: function() {
-
+				
+			},
+			update: function() {
+				console.log('hey');
 			}
 		}, {
 			type: "input",
 			text: "Set Their Gold",
 			reset: true,
+			run: function() {
+
+			}
+		}, {
+			type: "button",
+			text: "Max Their Gold",
+			run: function() {
+
+			}
+		}, {
+			type: "button",
+			text: "Swap",
 			run: function() {
 
 			}
@@ -1338,6 +1446,173 @@ async function injectConnection() {
 	}
 }
 
+function generateCheat(cheat) {
+	let ele;
+	let eleInput; let eleButton;
+	const boundRun = cheat.run?.bind(cheat);
+	switch (cheat.type) {
+		case 'button':
+			ele = document.createElement('button');
+			ele.innerHTML = cheat.text;
+			ele.onclick = boundRun;
+			break;
+		case 'toggle':
+			ele = document.createElement('button');
+			ele.classList.add('xmods-toggle');
+			ele.dataset.state = cheat.state || 0;
+			ele.innerHTML = cheat.text;
+			ele.onclick = function() {
+				cheat.state = cheat.state === 0 ? 1 : 0;
+				ele.dataset.state = cheat.state || 0;
+				boundRun();
+			};
+			break;
+		case 'input':
+			ele = document.createElement('div');
+			ele.classList.add('xmods-input');
+			eleInput = document.createElement('input');
+			eleInput.type = 'text';
+			eleInput.placeholder = cheat.text;
+			ele.appendChild(eleInput);
+			cheat.input = eleInput;
+			eleButton = document.createElement('button');
+			eleButton.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M4 12.6111L8.92308 17.5L20 6.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>`;
+			eleButton.onclick = function() {
+				cheat.value = eleInput.value;
+				boundRun();
+				if (cheat.reset) eleInput.value = '';
+			};
+			ele.appendChild(eleButton);
+			break;
+		case 'justinput':
+			ele = document.createElement('div');
+			ele.classList.add('xmods-just-input');
+			eleInput = document.createElement('input');
+			eleInput.type = 'text';
+			eleInput.placeholder = cheat.text;
+			eleInput.onchange = function() {
+				cheat.value = eleInput.value;
+				boundRun();
+			};
+			ele.appendChild(eleInput);
+			cheat.input = eleInput;
+			break;
+		case 'toggleinput':
+			ele = document.createElement('div');
+			ele.classList.add('xmods-input', 'xmods-toggle');
+			ele.dataset.state = cheat.state || 0;
+			eleInput = document.createElement('input');
+			eleInput.type = 'text';
+			eleInput.placeholder = cheat.text;
+			ele.appendChild(eleInput);
+			eleButton = document.createElement('button');
+			eleButton.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M4 12.6111L8.92308 17.5L20 6.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>`;
+			eleButton.onclick = function() {
+				cheat.state = cheat.state === 0 ? 1 : 0;
+				ele.dataset.state = cheat.state || 0;
+				cheat.value = eleInput.value;
+				boundRun();
+			};
+			ele.appendChild(eleButton);
+			break;
+		case 'blookselect':
+		case 'select':
+			ele = document.createElement('div');
+			ele.classList.add('xmods-select');
+			eleButton = document.createElement('button');
+			eleButton.classList.add('xmods-choice');
+			if (cheat.type === 'blookselect') eleButton.classList.add('xmods-blook-choice');
+			cheat.value = Object.keys(cheat.options)[0];
+			let defaultText = document.createElement('p');
+			if (typeof cheat.options[cheat.value] === 'string') {
+				eleButton.classList.add('xmods-choice-no-img');
+				defaultText.innerHTML = cheat.options[cheat.value];
+			} else {
+				eleButton.style.backgroundImage = `url('${cheat.options[cheat.value][1]}')`;
+				defaultText.innerHTML = cheat.options[cheat.value][0];
+			}
+			eleButton.appendChild(defaultText);
+			eleButton.innerHTML += `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M7 10L12 15L17 10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>`;
+			ele.appendChild(eleButton);
+			let eleOptions = document.createElement('div');
+			eleOptions.classList.add('xmods-options');
+			if (cheat.type === 'blookselect') eleOptions.classList.add('xmods-blook-options');
+			eleOptions.style.display = 'none';
+			let option;
+			for (let o in cheat.options) {
+				option = document.createElement('button');
+				option.classList.add('xmods-option');
+				if (cheat.type !== 'blookselect') {
+					option.innerHTML = typeof cheat.options[o] === 'string' ? cheat.options[o] : cheat.options[o][0];
+				}
+				if (typeof cheat.options[o] === 'string') {
+					option.classList.add('xmods-choice-no-img');
+				} else {
+					option.style.backgroundImage = `url('${cheat.options[o][1]}')`;
+				}
+				option.dataset.value = o;
+				option.onclick = function() {
+					if (eleOptions.style.display !== 'none') {
+						eleOptions.style.display = 'none';
+						cheat.value = o;
+						defaultText = eleButton.querySelector('p');
+						if (typeof cheat.options[o] === 'string') {
+							eleButton.classList.add('xmods-choice-no-img');
+							eleButton.style.backgroundImage = '';
+							defaultText.innerHTML = cheat.options[o];
+						} else {
+							eleButton.classList.remove('xmods-choice-no-img');
+							eleButton.style.backgroundImage = `url('${cheat.options[o][1]}')`;
+							defaultText.innerHTML = cheat.options[o][0];
+						}
+						boundRun();
+					}
+				};
+				eleOptions.appendChild(option);
+			}
+			ele.appendChild(eleOptions);
+			eleButton.onclick = function() {
+				eleOptions.style.display = eleOptions.classList.contains('xmods-blook-options') ? 'grid' : 'block';
+				document.addEventListener('mousedown', function(e) {
+					if (!eleOptions.contains(e.target) && !eleButton.contains(e.target)) {
+						eleOptions.style.display = 'none';
+					}
+				}, { once: true });
+			}
+			break;
+		case 'slider':
+			ele = document.createElement('div');
+			ele.classList.add('xmods-slider');
+			let labelText = document.createElement('p');
+			labelText.innerHTML = cheat.text;
+			ele.appendChild(labelText);
+			let slider = document.createElement('input');
+			slider.classList.add('xmods-range');
+			slider.type = 'range';
+			slider.min = cheat.min || 0;
+			slider.max = cheat.max || 100;
+			slider.value = cheat.value || 50;
+			slider.style.setProperty('--fill', `${(slider.value - slider.min) / (slider.max - slider.min) * 100}%`);
+			slider.oninput = function() {
+				slider.style.setProperty('--fill', `${(slider.value - slider.min) / (slider.max - slider.min) * 100}%`);
+				cheat.value = slider.value;
+				boundRun();
+			};
+			ele.appendChild(slider);
+			break;
+		default:
+			console.warn(`Unknown UI element type: ${cheat.type}`);
+	}
+	if (cheat.wide) {
+		ele?.classList.add('xmods-wide');
+	}
+
+	if (cheat.update) {
+		const boundUpdate = cheat.update?.bind(cheat);
+		cheat._updateLoop = setInterval(() => boundUpdate(), 1000);
+	}
+	return ele;
+}
 function generateUI(section) {
 	if (!(section in CHEATS)) return null;
 	if (document.querySelector(`#xmods-gui-${section.replace('_', '-')}`)) return null;
@@ -1346,185 +1621,31 @@ function generateUI(section) {
 	const newHeader = document.createElement('h1');
 	newHeader.innerHTML = section.toLowerCase().split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 	newHeader.onclick = e => uiCollapse(e.currentTarget, section.replace('_', '-'));
-	mainUI.appendChild(newHeader);
 
 	const newUI = document.createElement('section');
 	newUI.id = `xmods-gui-${section.replace('_', '-')}`;
 	if (mainUI.children.length >= 2) {
-		mainUI.insertBefore(newUI, mainUI.children[1]);
+		mainUI.insertBefore(newHeader, mainUI.children[2]);
+		mainUI.insertBefore(newUI, mainUI.children[3]);
 	} else {
+		mainUI.appendChild(newHeader);
 		mainUI.appendChild(newUI);
 	}
 
 	CHEATS[section].forEach(cheat => {
-		let ele;
-		let eleInput; let eleButton;
-		const boundRun = cheat.run?.bind(cheat);
-		switch (cheat.type) {
-			case 'button':
-				ele = document.createElement('button');
-				ele.innerHTML = cheat.text;
-				ele.onclick = boundRun;
-				newUI.appendChild(ele);
-				break;
-			case 'toggle':
-				ele = document.createElement('button');
-				ele.classList.add('xmods-toggle');
-				ele.dataset.state = cheat.state || 0;
-				ele.innerHTML = cheat.text;
-				ele.onclick = function() {
-					cheat.state = cheat.state === 0 ? 1 : 0;
-					ele.dataset.state = cheat.state || 0;
-					boundRun();
-				};
-				newUI.appendChild(ele);
-				break;
-			case 'input':
-				ele = document.createElement('div');
-				ele.classList.add('xmods-input');
-				eleInput = document.createElement('input');
-				eleInput.type = 'text';
-				eleInput.placeholder = cheat.text;
-				ele.appendChild(eleInput);
-				cheat.input = eleInput;
-				eleButton = document.createElement('button');
-				eleButton.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M4 12.6111L8.92308 17.5L20 6.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>`;
-				eleButton.onclick = function() {
-					cheat.value = eleInput.value;
-					boundRun();
-					if (cheat.reset) eleInput.value = '';
-				};
-				ele.appendChild(eleButton);
-				newUI.appendChild(ele);
-				break;
-			case 'justinput':
-				ele = document.createElement('div');
-				ele.classList.add('xmods-just-input');
-				eleInput = document.createElement('input');
-				eleInput.type = 'text';
-				eleInput.placeholder = cheat.text;
-				eleInput.onchange = function() {
-					cheat.value = eleInput.value;
-					boundRun();
-				};
-				ele.appendChild(eleInput);
-				cheat.input = eleInput;
-				newUI.appendChild(ele);
-				break;
-			case 'toggleinput':
-				ele = document.createElement('div');
-				ele.classList.add('xmods-input', 'xmods-toggle');
-				ele.dataset.state = cheat.state || 0;
-				eleInput = document.createElement('input');
-				eleInput.type = 'text';
-				eleInput.placeholder = cheat.text;
-				ele.appendChild(eleInput);
-				eleButton = document.createElement('button');
-				eleButton.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M4 12.6111L8.92308 17.5L20 6.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>`;
-				eleButton.onclick = function() {
-					cheat.state = cheat.state === 0 ? 1 : 0;
-					ele.dataset.state = cheat.state || 0;
-					cheat.value = eleInput.value;
-					boundRun();
-				};
-				ele.appendChild(eleButton);
-				newUI.appendChild(ele);
-				break;
-			case 'blookselect':
-			case 'select':
-				ele = document.createElement('div');
-				ele.classList.add('xmods-select');
-				eleButton = document.createElement('button');
-				eleButton.classList.add('xmods-choice');
-				if (cheat.type === 'blookselect') eleButton.classList.add('xmods-blook-choice');
-				cheat.value = Object.keys(cheat.options)[0];
-				let defaultText = document.createElement('p');
-				if (typeof cheat.options[cheat.value] === 'string') {
-					eleButton.classList.add('xmods-choice-no-img');
-					defaultText.innerHTML = cheat.options[cheat.value];
-				} else {
-					eleButton.style.backgroundImage = `url('${cheat.options[cheat.value][1]}')`;
-					defaultText.innerHTML = cheat.options[cheat.value][0];
-				}
-				eleButton.appendChild(defaultText);
-				eleButton.innerHTML += `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M7 10L12 15L17 10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>`;
-				ele.appendChild(eleButton);
-				let eleOptions = document.createElement('div');
-				eleOptions.classList.add('xmods-options');
-				if (cheat.type === 'blookselect') eleOptions.classList.add('xmods-blook-options');
-				eleOptions.style.display = 'none';
-				let option;
-				for (let o in cheat.options) {
-					option = document.createElement('button');
-					option.classList.add('xmods-option');
-					if (cheat.type !== 'blookselect') {
-						option.innerHTML = typeof cheat.options[o] === 'string' ? cheat.options[o] : cheat.options[o][0];
-					}
-					if (typeof cheat.options[o] === 'string') {
-						option.classList.add('xmods-choice-no-img');
-					} else {
-						option.style.backgroundImage = `url('${cheat.options[o][1]}')`;
-					}
-					option.dataset.value = o;
-					option.onclick = function() {
-						if (eleOptions.style.display !== 'none') {
-							eleOptions.style.display = 'none';
-							cheat.value = o;
-							defaultText = eleButton.querySelector('p');
-							if (typeof cheat.options[o] === 'string') {
-								eleButton.classList.add('xmods-choice-no-img');
-								eleButton.style.backgroundImage = '';
-								defaultText.innerHTML = cheat.options[o];
-							} else {
-								eleButton.classList.remove('xmods-choice-no-img');
-								eleButton.style.backgroundImage = `url('${cheat.options[o][1]}')`;
-								defaultText.innerHTML = cheat.options[o][0];
-							}
-							boundRun();
-						}
-					};
-					eleOptions.appendChild(option);
-				}
-				ele.appendChild(eleOptions);
-				eleButton.onclick = function() {
-					eleOptions.style.display = eleOptions.classList.contains('xmods-blook-options') ? 'grid' : 'block';
-					document.addEventListener('mousedown', function(e) {
-						if (!eleOptions.contains(e.target) && !eleButton.contains(e.target)) {
-							eleOptions.style.display = 'none';
-						}
-					}, { once: true });
-				}
-				newUI.appendChild(ele);
-				break;
-			case 'slider':
-				ele = document.createElement('div');
-				ele.classList.add('xmods-slider');
-				let labelText = document.createElement('p');
-				labelText.innerHTML = cheat.text;
-				ele.appendChild(labelText);
-				let slider = document.createElement('input');
-				slider.classList.add('xmods-range');
-				slider.type = 'range';
-				slider.min = cheat.min || 0;
-				slider.max = cheat.max || 100;
-				slider.value = cheat.value || 50;
-				slider.style.setProperty('--fill', `${(slider.value - slider.min) / (slider.max - slider.min) * 100}%`);
-				slider.oninput = function() {
-					slider.style.setProperty('--fill', `${(slider.value - slider.min) / (slider.max - slider.min) * 100}%`);
-					cheat.value = slider.value;
-					boundRun();
-				};
-				ele.appendChild(slider);
-				newUI.appendChild(ele);
-				break;
-			default:
-				console.warn(`Unknown UI element type: ${cheat.type}`);
-		}
-		if (cheat.wide) {
-			ele?.classList.add('xmods-wide');
-		}
+		const ele = generateCheat(cheat);
+		newUI.appendChild(ele);
+		cheat._dom = ele;
 	});
 }
+function updateUI(cheat) {
+	console.log(cheat);
+	if (cheat._updateLoop) clearInterval(cheat._updateLoop);
+	const newEle = generateCheat(cheat);
+	cheat._dom.replaceWith(newEle);
+	cheat._dom = newEle;
+}
+
 generateUI('global');
 if (!window.location.hostname.startsWith('solo.')) {
 	generateUI('bot_flooder');
