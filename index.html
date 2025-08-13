@@ -8,11 +8,11 @@
 	<style>
 		@font-face {
 			font-family: 'Titan One';
-			src: url('https://github.com/qwkdev/xmods/raw/refs/heads/main/static/titanone.woff2') format('woff2');
+			src: url('/static/titanone.woff2') format('woff2');
 		}
 		@font-face {
 			font-family: 'Nunito';
-			src: url('https://github.com/qwkdev/xmods/raw/refs/heads/main/static/nunito.woff2') format('woff2');
+			src: url('/static/nunito.woff2') format('woff2');
 		}
 
 		body {
@@ -157,7 +157,7 @@
 	<script>
 		async function copy() {
 			try {
-				const response = await fetch('https://github.com/qwkdev/xmods/raw/refs/heads/main/scripts/blooket.js');
+				const response = await fetch('/scripts/blooket.js');
 
 				if (!response.ok) {
 					throw new Error(`Failed to fetch. Status: ${response.status}`);
