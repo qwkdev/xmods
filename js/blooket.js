@@ -904,8 +904,6 @@ const COSMETIC_OPTIONS = {
 	}
 }
 
-//! TODO: Bot flood amount input cuts off 10 into 1, parseInt then clamp else clamp string
-//! TODO: 0 should be valid amount
 const CHEATS = {
 	global: [
 		{
