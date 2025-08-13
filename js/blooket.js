@@ -1,6 +1,6 @@
 (() => {
 
-const VERSION = "12.08.25";
+const VERSION = "13.08.25";
 
 if (document.getElementById("xmods-gui")) {
 	document.getElementById('xmods-gui').remove();
@@ -505,6 +505,12 @@ function randomNumbers(len) {
 function repeatText(text, times) {
 	return new Array(times).fill(text).join(' ');
 }
+function arrayEqual(a, b) {
+	if (a.length !== b.length) return false;
+	const sortedA = [...a].sort();
+	const sortedB = [...b].sort();
+	return sortedA.every((value, index) => value === sortedB[index]);
+}
 
 const COSMETIC_OPTIONS = {
 	blooks: {
@@ -899,61 +905,8 @@ const COSMETIC_OPTIONS = {
 }
 
 //! TODO: Bot flood amount input cuts off 10 into 1, parseInt then clamp else clamp string
+//! TODO: 0 should be valid amount
 const CHEATS = {
-	example: [
-		{
-			type: "button",
-			text: "Example Action",
-			state: 0,
-			run: function() {
-				console.log('Clicked button:', this.type, this.text, this.state);
-				this.state = this.state === 0 ? 1 : 0; // JUST AN EXAMPLE, USE A TOGGLE FOR TS
-			}
-		}, {
-			type: "toggle",
-			text: "Example Toggle",
-			state: 0,
-			run: function() {
-				console.log('Example Toggle', this.state);
-			}
-		}, {
-			type: "input",
-			wide: true,
-			text: "Wide Input",
-			run: function() {
-				console.log('Wide input', this.value);
-			}
-		}, {
-			type: "toggleinput",
-			text: "Example Input Toggle",
-			state: 0,
-			run: function() {
-				console.log('Example Toggle Input', this.state, this.value);
-			}
-		}, {
-			type: "select",
-			options: {
-				'starter': 'Default',
-				'fire': 'Fire',
-				'outerSpace': ['Outer Space', 'https://media.blooket.com/image/upload/v1674539714/Banners/outerSpace.svg'],
-				'ice': ['Ice', 'https://media.blooket.com/image/upload/v1674539714/Banners/ice.svg']
-			},
-			run: function() {
-				console.log('Select', this.value);
-			}
-		}, {
-			type: "slider",
-			wide: true,
-			text: "Example Slider",
-			min: 20,
-			max: 60,
-			value: 50,
-			run: function() {
-				console.log('Wide slider', this.value);
-				gui.style.setProperty('--gui-width', `${this.value}vw`);
-			}
-		}
-	],
 	global: [
 		{
 			type: "slider",
@@ -1114,7 +1067,6 @@ const CHEATS = {
 
 				for (var n = 0; n < amount; n++) {
 					const name = CHEATS.bot_flooder[1].state ? randomString(15) : ((CHEATS.bot_flooder[0].value || 'bot') + randomNumbers(4));
-					console.log('trying', name, blook, banner, amount);
 					await sendBot(react.props.liveGameController._liveApp.firebase, react.props.client.hostId, name, blook, banner);
 				}
 			}
@@ -1283,8 +1235,8 @@ const CHEATS = {
 									});
 								}
 							}
-						} catch (i) {
-							console.log(i);
+						} catch (e) {
+							console.log(e);
 						}
 					}, 50);
 				}
@@ -1355,42 +1307,115 @@ const CHEATS = {
 				});
 			}
 		}, {
+			id: "playerSelect",
 			type: "select",
 			wide: true,
 			options: {
 				'': 'Loading Players...',
 			},
-			run: function() {
+			players: [],
+			run: function() {},
+			update: async function() {
+				const react = Object.values(document.querySelector("body div[id] > div > div"))[1].children[0]._owner.stateNode;
+				let players = await new Promise(res => react.props.liveGameController._liveApp ? react.props.liveGameController.getDatabaseVal("c", players => players && res(Object.keys(players))) : res([]));
 				
-			},
-			update: function() {
-				console.log('hey');
+				players = players.filter(player => player != react.props.client.name);
+
+				if (!arrayEqual(this.players, players)) {
+					this.players = players;
+					this.options = {
+						'': 'Select Player',
+						...Object.fromEntries(players.map(player => [player, player]))
+					};
+					updateUI(this);
+				}
 			}
 		}, {
 			type: "input",
 			text: "Set Their Gold",
 			reset: true,
 			run: function() {
+				const amount = parseInt(this.value);
+				this.input.value = amount;
+				if (!amount) return;
 
+				const player = getCheat(CHEATS.gold_quest, 'playerSelect').value;
+				if (!player) return;
+
+				const react = Object.values(document.querySelector('#app>div>div'))[1].children[0]._owner.stateNode;
+				react.props.liveGameController.setVal({
+					path: `c/${react.props.client.name}/tat`,
+					val: `${player}:swap:${amount}`
+				});
 			}
 		}, {
 			type: "button",
 			text: "Max Their Gold",
 			run: function() {
+				const player = getCheat(CHEATS.gold_quest, 'playerSelect').value;
+				if (!player) return;
 
+				const amount = Number.MAX_VALUE;
+				const react = Object.values(document.querySelector('#app>div>div'))[1].children[0]._owner.stateNode;
+				react.props.liveGameController.setVal({
+					path: `c/${react.props.client.name}/tat`,
+					val: `${player}:swap:${amount}`
+				});
 			}
 		}, {
 			type: "button",
 			text: "Swap",
 			run: function() {
+				const player = getCheat(CHEATS.gold_quest, 'playerSelect').value;
+				if (!player) return;
 
+				let react = Object.values(document.querySelector("body div[id] > div > div"))[1].children[0]._owner.stateNode;
+				react.props.liveGameController.getDatabaseVal("c", players => {
+					if (players?.[player]) {
+						const theirGold = players[player].g;
+						react.props.liveGameController.setVal({
+							path: "c/".concat(react.props.client.name),
+							val: {
+								b: react.props.client.blook,
+								g: theirGold,
+								tat: player + ":swap:" + react.state.gold
+							}
+						});
+						react.setState({
+							gold: theirGold,
+							gold2: theirGold
+						})
+					}
+				});
 			}
 		}, {
 			type: "input",
 			text: "Send Text",
 			reset: true,
-			run: function() {
+			run: async function() {
+				const player = getCheat(CHEATS.gold_quest, 'playerSelect').value;
+				if (!player) return;
 
+				const react = Object.values(document.querySelector('#app>div>div'))[1].children[0]._owner.stateNode;
+				const blook = react.props.client.blook;
+
+				const repeatedText = `Dog:${repeatText(this.value, 500)}`;
+				react.props.client.blook = repeatedText;
+				react.props.liveGameController.setVal({
+					path: `c/${react.props.client.name}/b`,
+					val: repeatedText
+				});
+				react.props.liveGameController.setVal({
+					path: `c/${react.props.client.name}/tat`,
+					val: `${player}:196`
+				}).then(setTimeout(function() {
+					react.props.client.blook = blook;
+					react.props.liveGameController.setVal({
+						path: `c/${react.props.client.name}/b`,
+						val: blook
+					});
+				}, 1000));
+				
 			}
 		}
 	],
@@ -1409,8 +1434,11 @@ const CHEATS = {
 	classic: []
 };
 
+function getCheat(cheats, id) {
+	return cheats.find(cheat => cheat.id === id) || false;
+}
+
 async function sendBot(firebase, game, name, blook, banner) {
-	console.log(game, name, blook, banner);
 	let joinReq = await fetch("https://fb.blooket.com/c/firebase/join", {
 		body: JSON.stringify({ id: game, name: name }),
 		credentials: "include",
@@ -1639,7 +1667,6 @@ function generateUI(section) {
 	});
 }
 function updateUI(cheat) {
-	console.log(cheat);
 	if (cheat._updateLoop) clearInterval(cheat._updateLoop);
 	const newEle = generateCheat(cheat);
 	cheat._dom.replaceWith(newEle);
