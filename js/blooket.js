@@ -1047,7 +1047,10 @@ const CHEATS = {
 			type: "justinput",
 			text: "Amount",
 			run: function() {
-				this.value = this.value.replace(/[^0-9]/g, '').slice(0, 1);
+				this.value = parseInt(this.value) || 0;
+				if (this.value > 9) this.value = 9;
+				else if (this.value < 1) this.value = 1;
+
 				this.input.value = this.value;
 			}
 		}, {
@@ -1246,9 +1249,10 @@ const CHEATS = {
 			text: "Set Gold",
 			reset: true,
 			run: function() {
-				const amount = parseInt(this.value);
+				let amount = parseInt(this.value);
+				if (amount < 0) amount = 0;
 				this.input.value = amount;
-				if (amount) {
+				if (amount || amount === 0) {
 					var react = Object.values(document.querySelector("body div[id] > div > div"))[1].children[0]._owner.stateNode;
 					react.setState({
 						gold: amount,
@@ -1335,9 +1339,10 @@ const CHEATS = {
 			text: "Set Their Gold",
 			reset: true,
 			run: function() {
-				const amount = parseInt(this.value);
+				let amount = parseInt(this.value);
+				if (amount < 0) amount = 0;
 				this.input.value = amount;
-				if (!amount) return;
+				if (!amount && amount != 0) return;
 
 				const player = getCheat(CHEATS.gold_quest, 'playerSelect').value;
 				if (!player) return;
