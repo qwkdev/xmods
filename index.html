@@ -122,19 +122,42 @@
 			width: 80vw;
 
 			position: absolute;
-			bottom: 20px;
+			bottom: 1vh;
 			left: 50%;
 			transform: translateX(-50%);
 
 			margin: 0;
 			font-family: 'Nunito';
-			font-size: 35px;
+			font-size: 3vh;
 			color: #fff;
 			margin: 0;
 			box-sizing: border-box;
 			font-weight: 700;
 			font-style: normal;
 			text-align: center;
+		}
+
+		@media only screen and (max-width: 100vh) {
+			#main {
+				h1 {
+					width: 90vw;
+				}
+				button {
+					width: 80vw;
+					white-space: normal;
+					height: min-content;
+				}
+			}
+			#info {
+				font-size: 4w;
+				bottom: 2vw;
+			}
+		}
+		@media only screen and (max-width: 70vh) {
+			#info {
+				font-size: 5vw;
+				bottom: 2vw;
+			}
 		}
 	</style>
 </head>
