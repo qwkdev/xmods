@@ -96,7 +96,19 @@ WebGL.uniform4fv = new Proxy(WebGL.uniform4fv, {
 	apply(target, thisArg, [loc, value]) {
 		if (loc && value && (loc?.name.endsWith('unity_ObjectToWorld') || loc?.name.endsWith('unity_ObjectToWorld[0]'))) {
 			loc.program.isUIProgram = true;
+
+			const prog = loc.program;
+			prog._objectToWorld = new Float32Array(value);
+			prog._position = {
+				x: value[12],
+				y: value[13],
+				z: value[14],
+			}
 		}
+
+		if (loc?.name.endsWith('unity_MatrixVP') || loc?.name.endsWith('unity_MatrixVP[0]')) {
+            currentVPMatrix = new Float32Array(value);
+        }
 
 		return Reflect.apply(...arguments);
 	},
@@ -120,6 +132,7 @@ const drawHandler = {
 
 			if (prog._position) {
 				playerPos.push(prog._position);
+				// console.log(prog._position);
 			}
 		}
 		const result = Reflect.apply(...arguments);
@@ -132,3 +145,89 @@ WebGL.drawElementsInstanced = new Proxy(
 	WebGL.drawElementsInstanced,
 	drawHandler,
 );
+
+function worldToScreen(pos, vp, width, height) {
+
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
+
+    const clipX = vp[0]*x + vp[4]*y + vp[8]*z + vp[12];
+    const clipY = vp[1]*x + vp[5]*y + vp[9]*z + vp[13];
+    const clipZ = vp[2]*x + vp[6]*y + vp[10]*z + vp[14];
+    const clipW = vp[3]*x + vp[7]*y + vp[11]*z + vp[15];
+
+    if (clipW <= 0)
+        return null;
+
+    const ndcX = clipX / clipW;
+    const ndcY = clipY / clipW;
+
+    return {
+        x: (ndcX * 0.5 + 0.5) * width,
+        y: (-ndcY * 0.5 + 0.5) * height,
+        depth: clipZ / clipW
+    };
+}
+
+const gameCanvas = document.getElementById('unity-canvas');
+const overlay = document.createElement('canvas');
+overlay.style.position = 'fixed';
+overlay.style.left = '0';
+overlay.style.top = '0';
+overlay.style.width = '100vw';
+overlay.style.height = '100vh';
+overlay.style.pointerEvents = 'none';
+overlay.style.zIndex = '999999';
+document.body.appendChild(overlay);
+const overlayCtx = overlay.getContext('2d');
+
+overlayCtx.fillStyle = '#ff00ff';
+overlayCtx.beginPath();
+overlayCtx.arc(parseInt(500/100), parseInt(300/100), 10, 0, Math.PI * 2);
+overlayCtx.fill();
+overlayCtx.beginPath();
+overlayCtx.arc(parseInt(300), parseInt(300), 10, 0, Math.PI * 2);
+overlayCtx.fill();
+
+// ctx.fillStyle = 'red';
+// ctx.fillRect(0, 0, overlay.width, overlay.height);
+
+window.requestAnimationFrame = new Proxy(window.requestAnimationFrame, {
+    apply(target, thisArg, args) {
+        args[0] = new Proxy(args[0], {
+            apply() {
+				console.log('[.] starting');
+				// ctx.clearRect(0, 0, overlay.width, overlay.height);
+
+				for (const player of playerPos) {
+					const p = worldToScreen(
+						player,
+						currentVPMatrix,
+						gameCanvas.width,
+						gameCanvas.height
+					);
+
+					console.log('[.] ok...');
+
+					if (!p) continue;
+
+					console.log('[.] ok2...', p);
+
+					overlayCtx.fillStyle = '#ff00ff';
+					overlayCtx.beginPath();
+					overlayCtx.arc(p.x/10, p.y/10, 5, 0, Math.PI * 2);
+					overlayCtx.fill();
+
+					console.log('[.] yay');
+				}
+
+
+				// console.log(playerPos);
+                playerPos = [];
+                return Reflect.apply(...arguments);
+            }
+        });
+        return Reflect.apply(...arguments);
+    }
+});
