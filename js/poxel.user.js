@@ -35,15 +35,12 @@ WebGL.shaderSource = new Proxy(WebGL.shaderSource, {
 
 		if (source.indexOf('gl_Position') > -1) {
 			if (source.indexOf('unity_ObjectToWorld') > -1)
-				console.log('[SOURCE]', target, thisArg, args);
-				
 				shader.isPlayerShader = true;
 
 			source = source.replace(
 				'void main',
 				`out float vDepth;
 				out vec3 vWorldPos;
-
 				uniform bool uESP;
 				uniform float uDepthCut;
 				void main`,
@@ -54,24 +51,22 @@ WebGL.shaderSource = new Proxy(WebGL.shaderSource, {
 				if (uESP && vDepth > uDepthCut) { gl_Position.z = 1.0; }
 				`,
 			);
-		} else if (source.indexOf('SV_Target0') > -1) {
-			source = source.replace(
-				'void main',
-				`in float vDepth;
-				in vec3 vWorldPos;
+		} // else if (source.indexOf('SV_Target0') > -1) {
+		// 	source = source.replace(
+		// 		'void main',
+		// 		`in float vDepth;
+		// 		in vec3 vWorldPos;
 
-				uniform bool uESP;
-				uniform float uDepthCut;
-				void main`,
-			).replace(
-				/return;/,
-				`if (uESP && vDepth > uDepthCut) {
-					SV_Target0 = vec4(1.0, 1.0, 1.0, 0.2);
-				}`,
-			);
-			// args[0] = thisArg.LINES;
-			// SV_Target0 = vec4(1.0, 0.3, 0.5, 1.0);
-		}
+		// 		uniform bool uESP;
+		// 		uniform float uDepthCut;
+		// 		void main`,
+		// 	).replace(
+		// 		/return;/,
+		// 		`if (uESP && vDepth > uDepthCut) {
+		// 			SV_Target0 = vec4(1.0, 1.0, 1.0, 0.2);
+		// 		}`,
+		// 	);
+		// }
 		args[1] = source;
 		return Reflect.apply(...arguments);
 	},
@@ -79,10 +74,8 @@ WebGL.shaderSource = new Proxy(WebGL.shaderSource, {
 
 WebGL.attachShader = new Proxy(WebGL.attachShader, {
 	apply(target, thisArg, [program, shader]) {
-		if (shader.isPlayerShader) {
-			console.log('[SHADER]', shader);
+		if (shader.isPlayerShader)
 			program.isPlayerProgram = true;
-		}
 		return Reflect.apply(...arguments);
 	},
 });
@@ -107,31 +100,15 @@ WebGL.uniform4fv = new Proxy(WebGL.uniform4fv, {
 	},
 });
 
-let names = [];
-
 const drawHandler = {
 	apply(target, thisArg, args) {
 		const prog = thisArg.getParameter(thisArg.CURRENT_PROGRAM);
-		if (!prog._u) {
+		if (!prog._u)
 			prog._u = {
 				esp: thisArg.getUniformLocation(prog, 'uESP'),
 				depth: thisArg.getUniformLocation(prog, 'uDepthCut'),
 			};
-		}
-		const vc = args[1];
-		const isPlayer = prog.isPlayerProgram && vc === cfg.vertexCount;
-
-		if (isPlayer && !names.includes(prog.name)) {
-            console.log("[DRAW]", {
-                program: prog,
-                isPlayerProgram: prog.isPlayerProgram,
-                vertexCount: vc,
-            });
-
-            names.push(prog.name);
-        }
-
-
+		const isPlayer = prog.isPlayerProgram && args[1] === cfg.vertexCount;
 		if (prog._u.esp) thisArg.uniform1i(prog._u.esp, isPlayer);
 		if (prog._u.depth) thisArg.uniform1f(prog._u.depth, cfg.depthCut);
 		if (isPlayer) gl = thisArg;
