@@ -26,21 +26,18 @@ jobs:
       - name: Install Terser
         run: npm install -g terser
 
-      - name: Minify JavaScript files
+      - name: Minify UserScripts
         run: |
           mkdir -p scripts
-
           for file in js/*.js; do
             filename=$(basename "$file")
 
-            # Extract userscript header if present
             awk '
               /^\/\/ ==UserScript==/ {inblock=1}
               inblock {print}
               /^\/\/ ==\/UserScript==/ {exit}
             ' "$file" > header.tmp
 
-            # Remove header from source
             awk '
               BEGIN {skip=0}
               /^\/\/ ==UserScript==/ {skip=1}
@@ -48,15 +45,13 @@ jobs:
               !skip
             ' "$file" > body.tmp
 
-            # Minify body
             terser body.tmp \
               --compress \
               --mangle \
               -o body.min.js
 
-            # Reassemble
             if grep -q '^// ==UserScript==' header.tmp; then
-              cat header.tmp body.min.js > "scripts/$filename"
+              cat header.tmp <(echo) body.min.js > "scripts/$filename"
             else
               cp body.min.js "scripts/$filename"
             fi
@@ -66,7 +61,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
           git add scripts/*.js
           git commit -m "Minified JS on push" || echo "No changes to commit"
           git push
