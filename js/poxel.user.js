@@ -170,25 +170,36 @@ function worldToScreen(pos, vp, width, height) {
     };
 }
 
-const gameCanvas = document.querySelector('canvas');
+const gameCanvas = document.getElementById('unity-canvas');
 const overlay = document.createElement('canvas');
 overlay.style.position = 'fixed';
 overlay.style.left = '0';
 overlay.style.top = '0';
+overlay.style.width = '100vw';
+overlay.style.height = '100vh';
 overlay.style.pointerEvents = 'none';
 overlay.style.zIndex = '999999';
 document.body.appendChild(overlay);
+const overlayCtx = overlay.getContext('2d');
 
-overlay.width = gameCanvas.width;
-overlay.height = gameCanvas.height;
-const ctx = overlay.getContext('2d');
+overlayCtx.fillStyle = '#ff00ff';
+overlayCtx.beginPath();
+overlayCtx.arc(parseInt(500/100), parseInt(300/100), 10, 0, Math.PI * 2);
+overlayCtx.fill();
+overlayCtx.beginPath();
+overlayCtx.arc(parseInt(300), parseInt(300), 10, 0, Math.PI * 2);
+overlayCtx.fill();
+
+// ctx.fillStyle = 'red';
+// ctx.fillRect(0, 0, overlay.width, overlay.height);
 
 window.requestAnimationFrame = new Proxy(window.requestAnimationFrame, {
     apply(target, thisArg, args) {
         args[0] = new Proxy(args[0], {
             apply() {
 				console.log('[.] starting');
-				ctx.clearRect(0, 0, overlay.width, overlay.height);
+				// ctx.clearRect(0, 0, overlay.width, overlay.height);
+
 				for (const player of playerPos) {
 					const p = worldToScreen(
 						player,
@@ -201,11 +212,12 @@ window.requestAnimationFrame = new Proxy(window.requestAnimationFrame, {
 
 					if (!p) continue;
 
-					console.log('[.] ok2...');
+					console.log('[.] ok2...', p);
 
-					ctx.beginPath();
-					ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-					ctx.fill();
+					overlayCtx.fillStyle = '#ff00ff';
+					overlayCtx.beginPath();
+					overlayCtx.arc(p.x/10, p.y/10, 5, 0, Math.PI * 2);
+					overlayCtx.fill();
 
 					console.log('[.] yay');
 				}
