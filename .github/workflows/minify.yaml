@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'js/*.js'
+      - '!js/*user.js'
 
 permissions:
   contents: write
