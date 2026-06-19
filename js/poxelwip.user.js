@@ -114,7 +114,7 @@ WebGL.uniform4fv = new Proxy(WebGL.uniform4fv, {
 	},
 });
 
-let playerPos = [];
+let playerPos = {};
 
 const drawHandler = {
 	apply(target, thisArg, args) {
@@ -131,8 +131,8 @@ const drawHandler = {
 			gl = thisArg;
 
 			if (prog._position) {
-				playerPos.push(prog._position);
-				// console.log(prog._position);
+				playerPos[prog.name] = { ...prog._position, t: performance.now() };
+				// console.log('[PROG]', prog.name, prog);
 			}
 		}
 		const result = Reflect.apply(...arguments);
@@ -170,64 +170,91 @@ function worldToScreen(pos, vp, width, height) {
     };
 }
 
-const gameCanvas = document.getElementById('unity-canvas');
-const overlay = document.createElement('canvas');
-overlay.style.position = 'fixed';
-overlay.style.left = '0';
-overlay.style.top = '0';
-overlay.style.width = '100vw';
-overlay.style.height = '100vh';
-overlay.style.pointerEvents = 'none';
-overlay.style.zIndex = '999999';
-document.body.appendChild(overlay);
-const overlayCtx = overlay.getContext('2d');
-
-overlayCtx.fillStyle = '#ff00ff';
-overlayCtx.beginPath();
-overlayCtx.arc(parseInt(500/100), parseInt(300/100), 10, 0, Math.PI * 2);
-overlayCtx.fill();
-overlayCtx.beginPath();
-overlayCtx.arc(parseInt(300), parseInt(300), 10, 0, Math.PI * 2);
-overlayCtx.fill();
-
-// ctx.fillStyle = 'red';
-// ctx.fillRect(0, 0, overlay.width, overlay.height);
+const debugEle = document.createElement('p');
+debugEle.style.cssText = `font-size: 15px; font-family: monospace; text-align: left; position: fixed; top: 0; left: 0; background: #0009; color: #fff;`
+document.body.appendChild(debugEle);
 
 window.requestAnimationFrame = new Proxy(window.requestAnimationFrame, {
     apply(target, thisArg, args) {
         args[0] = new Proxy(args[0], {
             apply() {
-				console.log('[.] starting');
-				// ctx.clearRect(0, 0, overlay.width, overlay.height);
-
-				for (const player of playerPos) {
-					const p = worldToScreen(
-						player,
-						currentVPMatrix,
-						gameCanvas.width,
-						gameCanvas.height
-					);
-
-					console.log('[.] ok...');
-
-					if (!p) continue;
-
-					console.log('[.] ok2...', p);
-
-					overlayCtx.fillStyle = '#ff00ff';
-					overlayCtx.beginPath();
-					overlayCtx.arc(p.x/10, p.y/10, 5, 0, Math.PI * 2);
-					overlayCtx.fill();
-
-					console.log('[.] yay');
-				}
-
-
+				// debugEle.innerHTML = `<pre>${Object.entries(playerPos)
+				// 	.map(e => [...([e[1].x, e[1].y, e[1].z].map(Math.round)), e[0]])
+				// 	.map(JSON.stringify)
+				// 	.join('<br>')}</pre>`;
+				// playerPos = [];
 				// console.log(playerPos);
-                playerPos = [];
                 return Reflect.apply(...arguments);
             }
         });
         return Reflect.apply(...arguments);
     }
 });
+
+function showData(data) {
+	if (data instanceof ArrayBuffer) bytes = new Uint8Array(data);
+    else if (data instanceof Uint8Array) bytes = data;
+
+	if (
+		!bytes ||
+		(bytes[0] === 13 && (bytes[1] === 40 || bytes[1] === 80)) ||
+		(bytes[0] === 15 && bytes[1] === 255)
+	) return null;
+
+	debugEle.innerHTML = `${Array.from(bytes).map(n => {
+		const s = String(n);
+		return s.padStart(3, '0');
+	}).join(' ')}`;
+
+	return bytes;
+}
+
+const OrigWS = window.WebSocket;
+window.WebSocket = function(...args) {
+    const ws = new OrigWS(...args);
+    ws.addEventListener('open', () => {
+        gameSocket = ws;
+        console.log('%cHooked', 'font-size: 30px; color: red;');
+    });
+    const origSend = ws.send.bind(ws);
+    ws.send = function(data) {
+		const r = showData(data);
+		if (r !== null) console.log('[ws OUT]', r);
+        // if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
+        //     const modified = processOutgoing(data);
+        //     if (modified === null) return;
+        //     return origSend(modified);
+        // }
+        return origSend(data);
+    };
+
+	window.wssend = d => {
+		const n = new Uint8Array(d.length);
+        n.set(d);
+		ws.send(n.buffer);
+	};
+
+    ws.addEventListener('message', e => {
+		const r = showData(e.data);
+		if (r !== null) console.log('[ws IN]', r);
+	});
+    return ws;
+};
+window.WebSocket.prototype = OrigWS.prototype;
+Object.assign(window.WebSocket, { CONNECTING: 0, OPEN: 1, CLOSING: 2, CLOSED: 3 });
+
+
+
+// glock to player
+// window.wssend([
+//    13,  59, 137, 161, 116, 203,  64, 129,  29, 156,   6, 204,
+//     0,   0, 168, 116,  97, 114, 103, 101, 116,  73, 100, 169,
+//    98, 106,  97, 107, 122, 106,  76,  50,  56, 166,  97, 109,
+//   111, 117, 110, 116,  30, 165, 103, 117, 110,  73,  68,  13,
+//   164, 104, 105, 116,  88, 202,  65,  40, 152, 237, 164, 104,
+//   105, 116,  89, 202, 193, 166, 217, 238, 164, 104, 105, 116,
+//    90, 202, 194,  55, 241, 205, 167, 104, 105, 116,  78,  97,
+//   109, 101,   4, 162, 105, 100, 210, 133, 139, 177, 129
+// ]);
+
+
