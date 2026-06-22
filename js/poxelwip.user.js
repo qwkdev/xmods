@@ -10,7 +10,7 @@
 
 const cfg = {
 	vertexCount: 192,
-	depthCut: 0,
+	depthCut: 0
 };
 
 const WebGL = WebGL2RenderingContext.prototype;
@@ -146,44 +146,10 @@ WebGL.drawElementsInstanced = new Proxy(
 	drawHandler,
 );
 
-function worldToScreen(pos, vp, width, height) {
-
-    const x = pos.x;
-    const y = pos.y;
-    const z = pos.z;
-
-    const clipX = vp[0]*x + vp[4]*y + vp[8]*z + vp[12];
-    const clipY = vp[1]*x + vp[5]*y + vp[9]*z + vp[13];
-    const clipZ = vp[2]*x + vp[6]*y + vp[10]*z + vp[14];
-    const clipW = vp[3]*x + vp[7]*y + vp[11]*z + vp[15];
-
-    if (clipW <= 0)
-        return null;
-
-    const ndcX = clipX / clipW;
-    const ndcY = clipY / clipW;
-
-    return {
-        x: (ndcX * 0.5 + 0.5) * width,
-        y: (-ndcY * 0.5 + 0.5) * height,
-        depth: clipZ / clipW
-    };
-}
-
-const debugEle = document.createElement('p');
-debugEle.style.cssText = `font-size: 15px; font-family: monospace; text-align: left; position: fixed; top: 0; left: 0; background: #0009; color: #fff;`
-document.body.appendChild(debugEle);
-
 window.requestAnimationFrame = new Proxy(window.requestAnimationFrame, {
     apply(target, thisArg, args) {
         args[0] = new Proxy(args[0], {
             apply() {
-				// debugEle.innerHTML = `<pre>${Object.entries(playerPos)
-				// 	.map(e => [...([e[1].x, e[1].y, e[1].z].map(Math.round)), e[0]])
-				// 	.map(JSON.stringify)
-				// 	.join('<br>')}</pre>`;
-				// playerPos = [];
-				// console.log(playerPos);
                 return Reflect.apply(...arguments);
             }
         });
@@ -191,41 +157,116 @@ window.requestAnimationFrame = new Proxy(window.requestAnimationFrame, {
     }
 });
 
-function showData(data) {
-	if (data instanceof ArrayBuffer) bytes = new Uint8Array(data);
-    else if (data instanceof Uint8Array) bytes = data;
+function compareByIndex(a1, indices, a2) {
+	for (let i = 0; i < indices.length; i++) {
+		let j = indices[i];
+		if (a1[j] === undefined || a2[i] === undefined || a1[j] !== a2[i]) {
+			return false;
+		}
+	}
 
-	if (
-		!bytes ||
-		(bytes[0] === 13 && (bytes[1] === 40 || bytes[1] === 80)) ||
-		(bytes[0] === 15 && bytes[1] === 255)
-	) return null;
-
-	debugEle.innerHTML = `${Array.from(bytes).map(n => {
-		const s = String(n);
-		return s.padStart(3, '0');
-	}).join(' ')}`;
-
-	return bytes;
+	return true;
 }
 
-const OrigWS = window.WebSocket;
+function split8bit(data, delimiter, keepAsStr=false) {
+	const resp = String.fromCharCode(...data)
+		.split(String.fromCharCode(...delimiter));
+		
+	if (keepAsStr) return resp;
+	return resp.map(s => [...s].map(c => c.charCodeAt(0)));
+}
+
+// document.createElement();
+
+let players = {};
+function parseData(data) {
+    if (data instanceof ArrayBuffer) b = new Uint8Array(data);
+    else if (data instanceof Uint8Array) b = data;
+
+	// console.log('[ws]', b);
+
+    // if (!bytes || !(
+    //     bytes[0] === 13 &&
+    //     bytes[1] === 59 &&
+    //     bytes[2] === 137 &&
+    //     bytes[3] === 161 &&
+    //     bytes[4] === 116 &&
+    //     bytes[5] === 203 &&
+    //     bytes[6] === 64
+    // )) return;
+
+    // players.push(bytes.slice(24, 33));
+
+	if (!b) return
+
+	// if (compareByIndex(b,
+	// 	[0, 1, 2, 3], [14, 143, 0, 128]
+	// ))
+
+	if (compareByIndex(b,
+		[0, 1, 2, 3, 5],
+		[15, 255, 1, 128, 169]
+	)) {
+		// console.log('[ws] found somethjigngng....');
+		// console.log('[ws]', b);
+
+		const pid = b.slice(6, 15);
+		const parts = split8bit(b, pid);
+		const username = split8bit(parts[2].slice(2), [60], true)[0]
+		players[b[4]] = [pid, username];
+	} else if (compareByIndex(b,
+		[0, 1, 2, 3],
+		[15, 255, 1, 64]
+	)) {
+		// console.log('[ws] logout????...');
+		delete players[b[4]];
+	}
+}
+
+function sendKill(pid) {
+	window.wssend([
+		13, 59, 137, 161, 116, 203, 64,
+		123, 123, 123, 123, 123, //?
+		0, 0, 168, 116, 97, 114, 103, 101, 116, 73, 100, 169,
+		...pid,
+		166, 97, 109, 111, 117, 110, 116, 209, 0,
+		123, //?
+		165, 103, 117, 110, 73, 68, 3, 164, 104, 105, 116, 88, 202, 192,
+		123, 123, 123, //?
+		164, 104, 105, 116, 89, 202, 63,
+		123, 123, 123, //?
+		164, 104, 105, 116, 90, 202, 65,
+		123, 123, 123, //?
+		167, 104, 105, 116, 78, 97, 109, 101, 4, 162, 105, 100, 210,
+		123, 123, 123, 123 //?
+	]);
+}
+
+window.sendKill = pid => sendKill(pid);
+window.killPlayer = p => sendKill(players[p][0]);
+window.getPlayers = () => players;
+
+function killAll() {
+	Object.keys(players).forEach(p => sendKill(players[p][0]));
+}
+
+let killAllInterval;
+window.killAll = () => {
+	if (killAllInterval) { clearInterval(killAllInterval); return false }
+	else { setInterval(killAll, 100); return true }
+}
+
+const _WebSocket = window.WebSocket;
 window.WebSocket = function(...args) {
-    const ws = new OrigWS(...args);
+    const ws = new _WebSocket(...args);
     ws.addEventListener('open', () => {
         gameSocket = ws;
         console.log('%cHooked', 'font-size: 30px; color: red;');
     });
-    const origSend = ws.send.bind(ws);
-    ws.send = function(data) {
-		const r = showData(data);
-		if (r !== null) console.log('[ws OUT]', r);
-        // if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
-        //     const modified = processOutgoing(data);
-        //     if (modified === null) return;
-        //     return origSend(modified);
-        // }
-        return origSend(data);
+    const _WSSend = ws.send.bind(ws);
+    ws.send = d => {
+		parseData(d);
+        return _WSSend(d);
     };
 
 	window.wssend = d => {
@@ -234,16 +275,11 @@ window.WebSocket = function(...args) {
 		ws.send(n.buffer);
 	};
 
-    ws.addEventListener('message', e => {
-		const r = showData(e.data);
-		if (r !== null) console.log('[ws IN]', r);
-	});
+    ws.addEventListener('message', e => parseData(e.data));
     return ws;
 };
-window.WebSocket.prototype = OrigWS.prototype;
+window.WebSocket.prototype = _WebSocket.prototype;
 Object.assign(window.WebSocket, { CONNECTING: 0, OPEN: 1, CLOSING: 2, CLOSED: 3 });
-
-
 
 // glock to player
 // window.wssend([
@@ -256,5 +292,3 @@ Object.assign(window.WebSocket, { CONNECTING: 0, OPEN: 1, CLOSING: 2, CLOSED: 3 
 //    90, 202, 194,  55, 241, 205, 167, 104, 105, 116,  78,  97,
 //   109, 101,   4, 162, 105, 100, 210, 133, 139, 177, 129
 // ]);
-
-

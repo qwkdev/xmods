@@ -2,3 +2,4 @@ local/
 python/__pycache__
 python/.venv
 __*
+test/
