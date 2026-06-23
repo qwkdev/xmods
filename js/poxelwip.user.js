@@ -8,6 +8,10 @@
 // @grant		none
 // ==/UserScript==
 
+async function wait(t) {
+    return new Promise(r => setTimeout(r, t));
+}
+
 const cfg = {
 	vertexCount: 192,
 	depthCut: 0
@@ -171,89 +175,98 @@ function compareByIndex(a1, indices, a2) {
 function split8bit(data, delimiter, keepAsStr=false) {
 	const resp = String.fromCharCode(...data)
 		.split(String.fromCharCode(...delimiter));
-		
+
 	if (keepAsStr) return resp;
 	return resp.map(s => [...s].map(c => c.charCodeAt(0)));
 }
 
 // document.createElement();
 
-let players = {};
+window.players = {};
 function parseData(data) {
     if (data instanceof ArrayBuffer) b = new Uint8Array(data);
-    else if (data instanceof Uint8Array) b = data;
+    else b = data;
+	// if (data instanceof Uint8Array)
 
 	// console.log('[ws]', b);
 
-    // if (!bytes || !(
-    //     bytes[0] === 13 &&
-    //     bytes[1] === 59 &&
-    //     bytes[2] === 137 &&
-    //     bytes[3] === 161 &&
-    //     bytes[4] === 116 &&
-    //     bytes[5] === 203 &&
-    //     bytes[6] === 64
-    // )) return;
-
-    // players.push(bytes.slice(24, 33));
-
 	if (!b) return
 
-	// if (compareByIndex(b,
-	// 	[0, 1, 2, 3], [14, 143, 0, 128]
-	// ))
+	if (compareByIndex(b,
+		[0, 1, 2, 3], [14, 143, 0, 128]
+	)) {
+		console.log('%cHooking current players...', 'font-size: 20px; color: red;');
+		const parts = split8bit(b, [129,169])
+			.slice(1)
+			.map(p => split8bit(p, [130]).slice(0, 2))
+			.map(([p, u]) => [
+				p, String.fromCharCode(...split8bit(u.slice(1), [60])[0])
+			]);
+
+		window.players = {};
+		for (const part of parts) {
+			const pnum = split8bit(b, [169, ...part[0]])[0].at(-1);
+			window.players[pnum] = part;
+			console.log(`%cHooked ${pnum} ${part[1]}`, 'font-size: 15px; color: green;');
+		}
+	}
 
 	if (compareByIndex(b,
 		[0, 1, 2, 3, 5],
 		[15, 255, 1, 128, 169]
 	)) {
-		// console.log('[ws] found somethjigngng....');
-		// console.log('[ws]', b);
-
+		console.log('%cHooking new player...', 'font-size: 20px; color: red;');
 		const pid = b.slice(6, 15);
 		const parts = split8bit(b, pid);
 		const username = split8bit(parts[2].slice(2), [60], true)[0]
-		players[b[4]] = [pid, username];
+		window.players[b[4]] = [pid, username];
+		console.log(`%cHooked ${username}`, 'font-size: 15px; color: green;');
 	} else if (compareByIndex(b,
 		[0, 1, 2, 3],
 		[15, 255, 1, 64]
 	)) {
-		// console.log('[ws] logout????...');
-		delete players[b[4]];
+		console.log('%cUnhooking player...', 'font-size: 20px; color: red;');
+		delete window.players[b[4]];
 	}
+}
+
+function rws(n) {
+	return Array.from({ length: n }, () => Math.floor(Math.random() * 256));
 }
 
 function sendKill(pid) {
 	window.wssend([
 		13, 59, 137, 161, 116, 203, 64,
-		123, 123, 123, 123, 123, //?
+		...rws(5),
 		0, 0, 168, 116, 97, 114, 103, 101, 116, 73, 100, 169,
 		...pid,
 		166, 97, 109, 111, 117, 110, 116, 209, 0,
-		123, //?
+		...rws(1),
 		165, 103, 117, 110, 73, 68, 3, 164, 104, 105, 116, 88, 202, 192,
-		123, 123, 123, //?
+		...rws(3),
 		164, 104, 105, 116, 89, 202, 63,
-		123, 123, 123, //?
+		...rws(3),
 		164, 104, 105, 116, 90, 202, 65,
-		123, 123, 123, //?
+		...rws(3),
 		167, 104, 105, 116, 78, 97, 109, 101, 4, 162, 105, 100, 210,
-		123, 123, 123, 123 //?
+		...rws(4),
 	]);
 }
 
 window.sendKill = pid => sendKill(pid);
-window.killPlayer = p => sendKill(players[p][0]);
-window.getPlayers = () => players;
+window.killPlayer = p => sendKill(window.players[p][0]);
 
-function killAll() {
-	Object.keys(players).forEach(p => sendKill(players[p][0]));
+async function killAll() {
+	for (const p of Object.keys(window.players)) {
+		sendKill(window.players[p][0]);
+		wait(100);
+	}
 }
 
 let killAllInterval;
 window.killAll = () => {
 	if (killAllInterval) { clearInterval(killAllInterval); return false }
-	else { setInterval(killAll, 100); return true }
+	else { killAllInterval = setInterval(killAll, 100); return true }
 }
 
 const _WebSocket = window.WebSocket;
@@ -280,15 +293,3 @@ window.WebSocket = function(...args) {
 };
 window.WebSocket.prototype = _WebSocket.prototype;
 Object.assign(window.WebSocket, { CONNECTING: 0, OPEN: 1, CLOSING: 2, CLOSED: 3 });
-
-// glock to player
-// window.wssend([
-//    13,  59, 137, 161, 116, 203,  64, 129,  29, 156,   6, 204,
-//     0,   0, 168, 116,  97, 114, 103, 101, 116,  73, 100, 169,
-//    98, 106,  97, 107, 122, 106,  76,  50,  56, 166,  97, 109,
-//   111, 117, 110, 116,  30, 165, 103, 117, 110,  73,  68,  13,
-//   164, 104, 105, 116,  88, 202,  65,  40, 152, 237, 164, 104,
-//   105, 116,  89, 202, 193, 166, 217, 238, 164, 104, 105, 116,
-//    90, 202, 194,  55, 241, 205, 167, 104, 105, 116,  78,  97,
-//   109, 101,   4, 162, 105, 100, 210, 133, 139, 177, 129
-// ]);
