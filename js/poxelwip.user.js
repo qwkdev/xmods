@@ -8,6 +8,7 @@
 // @grant		none
 // ==/UserScript==
 
+
 async function wait(t) {
     return new Promise(r => setTimeout(r, t));
 }
