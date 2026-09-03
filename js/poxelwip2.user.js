@@ -277,6 +277,15 @@ function sendKill(pid) {
 	]);
 }
 
+function sendMsg(text) {
+  window.wssend([
+    13,71,129,164,98,111,100,121,
+    160+text.length,
+    ...(Array.from(text).map(s=>s.charCodeAt()))
+  ]);
+}
+
+window.sendMsg = t => sendMsg(t);
 window.sendKill = pid => sendKill(pid);
 window.killPlayer = p => sendKill(window.players[p][0]);
 
