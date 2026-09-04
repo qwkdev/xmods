@@ -289,21 +289,33 @@ window.sendMsg = t => sendMsg(t);
 window.sendKill = pid => sendKill(pid);
 window.killPlayer = p => sendKill(window.players[p][0]);
 
+let loops = {
+	killAll: [false, null];
+	message: [false, null];
+}
+
 async function killAll() {
 	for (const p of Object.keys(window.players)) {
     try { sendKill(window.players[p][0]); }
     catch (e) { console.error('[;]', e); }
 		wait(100);
 	}
-  if (killAllLoop) setTimeout(() => killAll(), 500);
+	if (loops.killAll) setTimeout(() => killAll(), 500);
+}
+async function spamMsg(msg) {
+	sendMsg(msg);
+  	if (loops.message) setTimeout(() => spamMsg(), 500);
 }
 
-let killAllLoop = false;
-window.killAll = () => {
-	killAllLoop = !killAllLoop;
-  if (killAllLoop) killAll();
-  return killAllLoop;
+function toggle(loop, func, data) {
+	loop[0] = !loop[0];
+	if (data) loop[1] = data;
+	if (loop[0]) func(...(loop[1] ? [loop[1]] : []));
+	return loop[0];
 }
+
+window.killAll = () => toggle(loops.killAll, killAll);
+window.spam = msg => toggle(loops.message, spamMsg, msg);
 
 const _WebSocket = window.WebSocket;
 window.WebSocket = function(...args) {
